@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.util.MinimumDate;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.time.Month;
+
 
 /**
  * Film.
@@ -18,9 +18,9 @@ public class Film {
     private String name;
     @Size(max = 200, message = "Размер описания не должен превышать 200 символов")
     private String description;
-   @MinimumDate
-@NotNull(message = "Дата выхода не существует")
+    @MinimumDate
+    @NotNull(message = "Дата выхода не существует")
     private LocalDate releaseDate;
-@Positive(message = "Длительность фильма не может быть отрицательной")
+    @Positive(message = "Длительность фильма не может быть отрицательной")
     private long duration;
 }
