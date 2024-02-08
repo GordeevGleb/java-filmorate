@@ -29,8 +29,7 @@ public class FilmController {
                 films.put(film.getId(), film);
                 log.info("Фильм {} добавлен", film.getName());
             }
-        }
-       catch (FilmValidationException e) {
+        } catch (FilmValidationException e) {
             log.warn("Ошибка валидации фильма {}", film.getName());
        }
         return film;
@@ -61,6 +60,7 @@ public class FilmController {
     private long generateId() {
         return ++maxId;
     }
+
     private boolean isValid(Film film) throws FilmValidationException {
         if (film.getName().trim().isBlank()) {
             log.warn("Название фильма не может быть пустым");
