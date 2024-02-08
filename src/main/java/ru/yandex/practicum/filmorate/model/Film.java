@@ -5,11 +5,6 @@ import ru.yandex.practicum.filmorate.util.MinimumDate;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-
-
-/**
- * Film.
- */
 @Data
 public class Film {
     private long id = 0;
