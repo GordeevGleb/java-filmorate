@@ -26,8 +26,7 @@ public class UserController {
                 users.put(user.getId(), user);
                 log.info("Пользователь {} добавлен", user.getLogin());
             }
-        }
-        catch (UserValidationException e) {
+        } catch (UserValidationException e) {
             log.warn("Ошибка валидации пользователя {}", user.getLogin());
         }
         return user;

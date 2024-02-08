@@ -31,7 +31,7 @@ public class FilmController {
             }
         } catch (FilmValidationException e) {
             log.warn("Ошибка валидации фильма {}", film.getName());
-       }
+        }
         return film;
     }
 
