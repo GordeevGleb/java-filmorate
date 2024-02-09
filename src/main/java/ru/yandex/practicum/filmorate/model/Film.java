@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 public class Film {
-    private long id = 0;
+    private long id = -1;
     @NotNull(message = "Название фильма не существует")
     @NotBlank(message = "Название фильма не может быть пустым")
     private String name;

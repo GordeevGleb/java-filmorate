@@ -30,24 +30,28 @@ public class FilmController {
                 log.info("Фильм {} добавлен", film.getName());
             }
         } catch (FilmValidationException e) {
+            System.out.println(e.getMessage());
             log.warn("Ошибка валидации фильма {}", film.getName());
         }
         return film;
     }
 
     @PutMapping("/films")
-    public Film updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) throws FilmValidationException {
         long filmId = film.getId();
-        Film currentFilm = films.get(filmId);
-        currentFilm.setName(film.getName());
-        log.info("Обновлено название фильма");
-        currentFilm.setDescription(film.getDescription());
-        log.info("Обновлено описание фильма");
-        currentFilm.setReleaseDate(film.getReleaseDate());
-        log.info("Обновлена дата выхода фильма");
-        currentFilm.setDuration(film.getDuration());
-        log.info("Обновлена длительность фильма");
-        return currentFilm;
+        if (films.containsKey(filmId) && isValid(film)) {
+            Film currentFilm = films.get(filmId);
+            currentFilm.setName(film.getName());
+            currentFilm.setDescription(film.getDescription());
+            currentFilm.setReleaseDate(film.getReleaseDate());
+            currentFilm.setDuration(film.getDuration());
+            log.info("Информация о фильме обновлена");
+            return currentFilm;
+        }
+        else {
+            log.warn("Информация о фильме не была обновлена");
+            throw new FilmValidationException("Ошибка при обновлении информации о фильме");
+        }
     }
 
     @GetMapping("/films")
@@ -63,23 +67,19 @@ public class FilmController {
 
     private boolean isValid(Film film) throws FilmValidationException {
         if (film.getName().trim().isBlank()) {
-            log.warn("Название фильма не может быть пустым");
-            throw new FilmValidationException();
+            throw new FilmValidationException("Название фильма не может быть пустым");
         }
 
         if (film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-            log.warn("Описание фильма не должно превышать 200 символов");
-            throw new FilmValidationException();
+            throw new FilmValidationException("Описание фильма не должно превышать 200 символов");
         }
 
         if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
-            log.warn("Неверная дата релиза фильма {}", film.getReleaseDate());
-            throw new FilmValidationException();
+            throw new FilmValidationException("Неверная дата релиза фильма {}");
         }
 
         if (film.getDuration() < MIN_DURATION) {
-            log.warn("Длительность фильма не может быть отрицательным значением");
-            throw new FilmValidationException();
+            throw new FilmValidationException("Длительность фильма не может быть отрицательным значением");
         }
         return true;
     }

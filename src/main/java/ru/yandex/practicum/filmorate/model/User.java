@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Data
 public class User {
-    private long id = 0;
+    private long id = -1;
     @NotNull(message = "Электронная почта не существует")
     @NotBlank(message = "Пустая электронная почта")
     @Email(message = "Некорректная электронная почта")

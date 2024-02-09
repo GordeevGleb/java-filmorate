@@ -33,18 +33,20 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public User updateUser(@Valid @RequestBody User user) {
+    public User updateUser(@Valid @RequestBody User user) throws UserValidationException {
         long userId = user.getId();
-        User currentUser = users.get(userId);
-        currentUser.setName(user.getName());
-        log.info("Обновлено имя пользователя");
-        currentUser.setEmail(user.getEmail());
-        log.info("Обновлен электронный адрес пользователя");
-        currentUser.setLogin(user.getLogin());
-        log.info("Обновлен логин пользователя");
-        currentUser.setBirthday(user.getBirthday());
-        log.info("Обновлена дата рождения пользователя");
-        return currentUser;
+        if (users.containsKey(userId) && isValid(user)) {
+            User currentUser = users.get(userId);
+            currentUser.setName(user.getName());
+            currentUser.setEmail(user.getEmail());
+            currentUser.setLogin(user.getLogin());
+            currentUser.setBirthday(user.getBirthday());
+            log.info("Информация о пользователе обновлена");
+            return currentUser;
+        } else {
+            log.warn("Данные пользователя не были обновлены");
+            throw new UserValidationException("Ошибка при обновлении информации о пользователе");
+        }
     }
 
     @GetMapping("/users")
@@ -60,13 +62,11 @@ public class UserController {
 
     private boolean isValid(User user) throws UserValidationException {
             if (user.getEmail().trim().isBlank() || !user.getEmail().contains("@")) {
-                log.warn("Некорректный электронный адрес");
-                throw new UserValidationException();
+                throw new UserValidationException("Некорректный электронный адрес");
             }
 
             if (user.getLogin().trim().isBlank() || user.getLogin().contains(" ")) {
-                log.warn("Некорректный логин");
-                throw new UserValidationException();
+                throw new UserValidationException("Некорректный логин");
             }
 
             if (Optional.ofNullable(user.getName()).isEmpty()) {
@@ -75,8 +75,7 @@ public class UserController {
             }
 
             if (user.getBirthday().isAfter(LocalDate.now())) {
-                log.warn("Некорректная дата");
-                throw new UserValidationException();
+                throw new UserValidationException("Некорректная дата");
             }
         return true;
     }
