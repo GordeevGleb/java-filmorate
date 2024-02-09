@@ -47,8 +47,7 @@ public class FilmController {
             currentFilm.setDuration(film.getDuration());
             log.info("Информация о фильме обновлена");
             return currentFilm;
-        }
-        else {
+        } else {
             log.warn("Информация о фильме не была обновлена");
             throw new FilmValidationException("Ошибка при обновлении информации о фильме");
         }
