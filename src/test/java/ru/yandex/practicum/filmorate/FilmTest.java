@@ -24,6 +24,7 @@ public class FilmTest {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
+
     @Test
     public void testFilmCreationWithoutName() {
         film = new Film();
@@ -34,6 +35,7 @@ public class FilmTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 2);
     }
+
     @Test
     public void testFilmCreationWithNameBlank() {
         film = new Film();
@@ -45,6 +47,7 @@ public class FilmTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 1);
     }
+
     @Test
     public void testFilmCreationWithBigDescription() {
         film = new Film();
@@ -59,6 +62,7 @@ public class FilmTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 1);
     }
+
     @Test
     public void testFilmCreationWithoutReleaseDate() {
         film = new Film();
@@ -69,6 +73,7 @@ public class FilmTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 1);
     }
+
     @Test
     public void testFilmCreationWithIncorrectReleaseDate() {
         film = new Film();
@@ -80,6 +85,7 @@ public class FilmTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 1);
     }
+
     @Test
     public void testFilmCreationWithNegativeDuration() {
         film = new Film();

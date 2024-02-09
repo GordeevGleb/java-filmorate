@@ -24,6 +24,7 @@ public class UserTest {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
+
     @Test
     public void testUserCreationWithoutEmail() {
         user = new User();
@@ -34,6 +35,7 @@ public class UserTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 2);
     }
+
     @Test
     public void testUserCreationWithEmailBlank() {
         user = new User();
@@ -45,6 +47,7 @@ public class UserTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 1);
     }
+
     @Test
     public void testUserCreationWithIncorrectEmail() {
         user = new User();
@@ -56,6 +59,7 @@ public class UserTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 1);
     }
+
     @Test
     public void testUserCreationWithoutLogin() {
         user = new User();
@@ -66,6 +70,7 @@ public class UserTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 2);
     }
+
     @Test
     public void testUserCreationWithLoginBlank() {
         user = new User();
@@ -77,6 +82,7 @@ public class UserTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 2);
     }
+
     @Test
     public void testUserCreationWithSpacesInLogin() {
         user = new User();
@@ -88,6 +94,7 @@ public class UserTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 1);
     }
+
     @Test
     public void testUserCreationWithoutBirthday() {
         user = new User();
@@ -98,6 +105,7 @@ public class UserTest {
         assertFalse(violations.isEmpty());
         assertEquals(violations.size(), 1);
     }
+
     @Test
     public void testUserCreationWithBirthdayInFuture() {
         user = new User();
