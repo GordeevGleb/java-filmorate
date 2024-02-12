@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,22 +19,19 @@ public class UserController {
 
     @PostMapping("/users")
     public User addUser(@Valid @RequestBody User user) {
-        try {
-            if (isValid(user)) {
-                user.setId(generateId());
-                users.put(user.getId(), user);
-                log.info("Пользователь {} добавлен", user.getLogin());
-            }
-        } catch (UserValidationException e) {
-            log.warn("Ошибка валидации пользователя {}", user.getLogin());
+        user.setId(generateId());
+        if (Optional.ofNullable(user.getName()).isEmpty()) {
+            user.setName(user.getLogin());
         }
+        users.put(user.getId(), user);
+        log.info("Пользователь {} добавлен", user.getLogin());
         return user;
     }
 
     @PutMapping("/users")
     public User updateUser(@Valid @RequestBody User user) throws UserValidationException {
         long userId = user.getId();
-        if (users.containsKey(userId) && isValid(user)) {
+        if (users.containsKey(userId)) {
             User currentUser = users.get(userId);
             currentUser.setName(user.getName());
             currentUser.setEmail(user.getEmail());
@@ -52,31 +48,11 @@ public class UserController {
     @GetMapping("/users")
     public List<User> getAllUsers() {
         List<User> resultList = new ArrayList<>(users.values());
-        log.info("Получен список пользователей");
+        log.info("Клиент получил список пользователей");
         return resultList;
     }
 
     private long generateId() {
         return ++maxId;
-    }
-
-    private boolean isValid(User user) throws UserValidationException {
-            if (user.getEmail().trim().isBlank() || !user.getEmail().contains("@")) {
-                throw new UserValidationException("Некорректный электронный адрес");
-            }
-
-            if (user.getLogin().trim().isBlank() || user.getLogin().contains(" ")) {
-                throw new UserValidationException("Некорректный логин");
-            }
-
-            if (Optional.ofNullable(user.getName()).isEmpty()) {
-                log.info("Имя пользователя не указано; в качестве имени использован логин");
-                user.setName(user.getLogin());
-            }
-
-            if (user.getBirthday().isAfter(LocalDate.now())) {
-                throw new UserValidationException("Некорректная дата");
-            }
-        return true;
     }
 }
