@@ -24,10 +24,12 @@ public class Film {
     @Positive(message = "Длительность фильма не может быть отрицательной")
     private long duration;
     private Set<Long> usersLike = new HashSet<>();
+
     public Set<Long> addLike(Long userId) {
         usersLike.add(userId);
         return usersLike;
     }
+
     public Set<Long> deleteLike(Long userId) {
         usersLike.remove(userId);
         return usersLike;

@@ -29,13 +29,14 @@ public class User {
     @Past(message = "Некорректная дата рождения")
     private LocalDate birthday;
     private Set<Long> friends = new HashSet<>();
+
     public Set<Long> addFriend(Long friendId) {
         friends.add(friendId);
         return friends;
     }
+
     public Set<Long> removeFriend(Long friendId) {
         friends.remove(friendId);
         return friends;
     }
-
 }
