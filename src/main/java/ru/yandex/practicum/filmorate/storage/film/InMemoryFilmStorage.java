@@ -10,6 +10,7 @@ import java.util.List;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
+
     private HashMap<Long, Film> films = new HashMap<>();
     private long maxId;
 
