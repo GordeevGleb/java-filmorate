@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
+
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 public class InMemoryFilmService implements FilmService {
@@ -17,6 +17,7 @@ public class InMemoryFilmService implements FilmService {
     private UserStorage userStorage;
     @Autowired
     private FilmStorage filmStorage;
+
     @Override
     public Film addLike(Long filmId, Long userId) throws UserValidationException {
         if (Optional.ofNullable(userStorage.getUserById(userId)).isEmpty()) {
@@ -46,6 +47,6 @@ public class InMemoryFilmService implements FilmService {
                 return o2.getUsersLike().size() - o1.getUsersLike().size();
             }
         });
-       return result;
+        return result;
     }
 }

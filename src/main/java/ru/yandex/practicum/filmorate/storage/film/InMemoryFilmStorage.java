@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 @Component
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
     private HashMap<Long, Film> films = new HashMap<>();
     private long maxId;
+
     @Override
     public Film addFilm(Film film) {
         film.setId(generateId());
@@ -50,11 +51,11 @@ public class InMemoryFilmStorage implements FilmStorage{
         if (films.containsKey(filmId)) {
             Film resultFilm = films.get(filmId);
             return resultFilm;
-        }
-        else {
+        } else {
             throw new NullPointerException("Фильм с id " + filmId + "не найден");
         }
     }
+
     private long generateId() {
         return ++maxId;
     }

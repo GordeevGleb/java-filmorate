@@ -60,6 +60,7 @@ public class UserController {
         userService.addFriend(userId, friendId);
         return new ArrayList<>(user.getFriends());
     }
+
     @DeleteMapping("/users/{userId}/friends/{friendId}")
     public List<Long> deleteFriend(@PathVariable long userId,
                                    @PathVariable long friendId) throws UserValidationException {
@@ -67,10 +68,12 @@ public class UserController {
         userService.deleteFriend(userId, friendId);
         return new ArrayList<>(user.getFriends());
     }
+
     @GetMapping("/users/{userId}/friends")
     public List<User> getAllUsersFriends(@PathVariable Long userId) throws UserValidationException {
         return userService.getUsersFriends(userId);
     }
+
     @GetMapping("/users/{userId}/friends/common/{friendId}")
     public List<User> getMutualFriends(@PathVariable Long userId,
                                        @PathVariable Long friendId) throws UserValidationException {
@@ -78,10 +81,10 @@ public class UserController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<Map<String, String>> handleUnknownUserException(final NullPointerException e)  {
-return new ResponseEntity<>(
-        Map.of("Ошибка", "Пользователь не найден"),
-        HttpStatus.NOT_FOUND
-);
+    public ResponseEntity<Map<String, String>> handleUnknownUserException(final NullPointerException e) {
+        return new ResponseEntity<>(
+                Map.of("Ошибка", "Пользователь не найден"),
+                HttpStatus.NOT_FOUND
+        );
     }
 }

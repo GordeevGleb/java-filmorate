@@ -54,8 +54,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.containsKey(userId)) {
             User resultUser = users.get(userId);
             return resultUser;
-        }
-        else {
+        } else {
             throw new NullPointerException("Пользователь с id " + userId + "не найден");
         }
     }

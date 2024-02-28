@@ -73,12 +73,10 @@ public class FilmController {
         if (Optional.ofNullable(count).isPresent()) {
             System.out.println(filmService.getTopRatedFilms().subList(0, count));
             return filmService.getTopRatedFilms().subList(0, count);
-        }
-        else {
+        } else {
             if (filmStorage.getAllFilms().size() < defaultCount) {
                 return filmService.getTopRatedFilms().subList(0, filmService.getTopRatedFilms().size());
-            }
-            else {
+            } else {
                 return filmService.getTopRatedFilms().subList(0, defaultCount);
             }
         }

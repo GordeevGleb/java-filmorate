@@ -15,14 +15,15 @@ public class InMemoryUserService implements UserService {
     @Autowired
     private UserStorage userStorage;
 
-@Override
+    @Override
     public List<Long> addFriend(long userId1, long userId2) throws UserValidationException {
-    User user1 = userStorage.getUserById(userId1);
-    User user2 = userStorage.getUserById(userId2);
+        User user1 = userStorage.getUserById(userId1);
+        User user2 = userStorage.getUserById(userId2);
         user1.addFriend(userId2);
         user2.addFriend(userId1);
         return new ArrayList<>(user1.getFriends());
     }
+
     @Override
     public List<Long> deleteFriend(long userId1, long userId2) throws UserValidationException {
         User user1 = userStorage.getUserById(userId1);
@@ -31,6 +32,7 @@ public class InMemoryUserService implements UserService {
         user2.removeFriend(userId1);
         return new ArrayList<>(user1.getFriends());
     }
+
     @Override
     public List<User> getMutualFriends(long userId1, long userId2) throws UserValidationException {
         User user1 = userStorage.getUserById(userId1);
