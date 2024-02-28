@@ -4,7 +4,7 @@ import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
-import java.util.Set;
+
 
 public interface UserService {
     public List<Long> addFriend(long userId1, long userId2) throws UserValidationException;
