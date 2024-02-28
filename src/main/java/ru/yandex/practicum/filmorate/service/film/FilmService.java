@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 
