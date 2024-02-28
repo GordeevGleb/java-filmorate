@@ -7,8 +7,12 @@ import java.util.List;
 
 public interface UserStorage {
     public User addUser(User user);
+
     public User deleteUser(long userId);
-    public User updateUser(User user)  throws UserValidationException;
+
+    public User updateUser(User user) throws UserValidationException;
+
     public List<User> getAllUsers();
+
     public User getUserById(long userId) throws UserValidationException;
 }
