@@ -1,5 +1,5 @@
 # java-filmorate
-!![Screenshot_26](https://github.com/GordeevGleb/java-filmorate/assets/146061679/2fd236d1-ed11-4739-a937-b8a573402432)
+![Screenshot_26](https://github.com/GordeevGleb/java-filmorate/assets/146061679/2fd236d1-ed11-4739-a937-b8a573402432)
 
 
 
