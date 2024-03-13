@@ -4,7 +4,7 @@
 
 
 
-## [Cсылка на оригинал таблицы](https://dbdiagram.io/d/65e9f26ab1f3d4062c63b323)
+## [ER-диаграмма](https://dbdiagram.io/d/65e9f26ab1f3d4062c63b323)
 ### Примеры запросов
 <details>
 <summary>Cписок всех пользователей по id и логину</summary>
