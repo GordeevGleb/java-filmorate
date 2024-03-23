@@ -10,6 +10,7 @@ import java.util.Set;
 
 @Data
 @Component
+@Builder
 public class User {
     private long id = -1;
 
