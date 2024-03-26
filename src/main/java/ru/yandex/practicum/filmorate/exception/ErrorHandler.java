@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exceptions;
+package ru.yandex.practicum.filmorate.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,20 @@ public class ErrorHandler {
 
     @ExceptionHandler
     public ResponseEntity<Map<String, String>> handleUnknownUserException(final UserNotFoundException e) {
+        return new ResponseEntity<>(
+                Map.of("Ошибка", e.getMessage()),
+                HttpStatus.NOT_FOUND
+        );
+    }
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleMpaNotFoundException(final MpaNotFoundException e) {
+        return new ResponseEntity<>(
+                Map.of("Ошибка", e.getMessage()),
+                HttpStatus.NOT_FOUND
+        );
+    }
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleGenreNotFoundException(final GenreNotFoundException e) {
         return new ResponseEntity<>(
                 Map.of("Ошибка", e.getMessage()),
                 HttpStatus.NOT_FOUND

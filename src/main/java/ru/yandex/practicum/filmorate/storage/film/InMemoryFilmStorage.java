@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 
 @Component
@@ -28,18 +29,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) throws FilmNotFoundException {
+    public Optional<Film> updateFilm(Film film) throws FilmNotFoundException {
         long filmId = film.getId();
-        if (films.containsKey(filmId)) {
-            Film currentFilm = films.get(filmId);
+        Film currentFilm = Optional.of(films.get(filmId)).
+                orElseThrow(()->new FilmNotFoundException("Ошибка при обновлении информации о фильме"));
+        if (currentFilm != null) {
             currentFilm.setName(film.getName());
             currentFilm.setDescription(film.getDescription());
             currentFilm.setReleaseDate(film.getReleaseDate());
             currentFilm.setDuration(film.getDuration());
-            return currentFilm;
-        } else {
-            throw new FilmNotFoundException("Ошибка при обновлении информации о фильме");
         }
+        return Optional.of(currentFilm);
     }
 
     @Override
@@ -49,13 +49,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(long filmId) throws FilmNotFoundException {
-        if (films.containsKey(filmId)) {
-            Film resultFilm = films.get(filmId);
-            return resultFilm;
-        } else {
-            throw new FilmNotFoundException("Фильм с id " + filmId + " не найден");
-        }
+    public Optional<Film> getFilmById(long filmId) throws FilmNotFoundException {
+        Film currentFilm = Optional.of(films.get(filmId)).
+                orElseThrow(() -> new FilmNotFoundException("Фильм с id " + filmId + " не найден"));
+        return Optional.of(currentFilm);
     }
 
     private long generateId() {

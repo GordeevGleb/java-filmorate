@@ -8,11 +8,17 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+
 @Component
 @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+@ToString
 public class User {
-    private long id = -1;
+    private long id;
 
     @NotNull(message = "Электронная почта не существует")
     @NotBlank(message = "Пустая электронная почта")
@@ -30,6 +36,8 @@ public class User {
     @Past(message = "Некорректная дата рождения")
     private LocalDate birthday;
     private Set<Long> friends = new HashSet<>();
+
+
 
     public Set<Long> addFriend(Long friendId) {
         friends.add(friendId);

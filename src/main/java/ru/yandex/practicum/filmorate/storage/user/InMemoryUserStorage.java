@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
 
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -29,18 +29,17 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) throws UserNotFoundException {
+    public Optional<User> updateUser(User user) throws UserNotFoundException {
         long userId = user.getId();
-        if (users.containsKey(userId)) {
-            User currentUser = users.get(userId);
-            currentUser.setName(user.getName());
-            currentUser.setEmail(user.getEmail());
-            currentUser.setLogin(user.getLogin());
-            currentUser.setBirthday(user.getBirthday());
-            return currentUser;
-        } else {
-            throw new UserNotFoundException("Пользователь(-и) не найден(-ы)");
-        }
+            User currentUser = Optional.of(users.get(userId)).
+                    orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден"));
+            if (currentUser != null) {
+                currentUser.setName(user.getName());
+                currentUser.setEmail(user.getEmail());
+                currentUser.setLogin(user.getLogin());
+                currentUser.setBirthday(user.getBirthday());
+            }
+            return Optional.of(currentUser);
     }
 
     @Override
@@ -50,13 +49,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(long userId) throws UserNotFoundException {
-        if (users.containsKey(userId)) {
-            User resultUser = users.get(userId);
-            return resultUser;
-        } else {
-            throw new UserNotFoundException("Пользователь(-и) не найден(-ы)");
-        }
+    public Optional<User> getUserById(long userId) {
+       return Optional.of(users.get(userId));
     }
 
     private long generateId() {

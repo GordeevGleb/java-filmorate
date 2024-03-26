@@ -3,10 +3,11 @@ package ru.yandex.practicum.filmorate.service.film;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -14,36 +15,30 @@ import java.util.*;
 
 
 @Service
-public class InMemoryFilmService implements FilmService {
+public class BaseFilmService implements FilmService {
     @Autowired
-    @Qualifier("userBean")
+    @Qualifier("userStorage")
     private UserStorage userStorage;
     @Autowired
-    @Qualifier("filmBean")
+    @Qualifier("filmStorage")
     private FilmStorage filmStorage;
 
     @Override
-    public Film addLike(Long filmId, Long userId) throws UserNotFoundException, FilmNotFoundException {
-        if (Optional.ofNullable(userStorage.getUserById(userId)).isEmpty()) {
-            throw new UserNotFoundException("Пользователь с id " + userId + " не найден");
-        }
-        Film film = filmStorage.getFilmById(filmId);
-        if (film.equals(null)) {
-            throw new FilmNotFoundException("Фильм с id " + filmId + " не найден");
-        }
+    public Film addLike(Long filmId, Long userId) throws FilmNotFoundException, UserNotFoundException {
+        Film film = filmStorage.getFilmById(filmId)
+                .orElseThrow(() -> new FilmNotFoundException("Фильм с id " + filmId + " не найден"));
+        User user = userStorage.getUserById(userId)
+                        .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден"));
         film.addLike(userId);
         return film;
     }
 
     @Override
     public Film deleteLike(Long filmId, Long userId) throws UserNotFoundException, FilmNotFoundException {
-        if (Optional.ofNullable(userStorage.getUserById(userId)).isEmpty()) {
-            throw new NullPointerException("Пользователь с id " + userId + " не найден");
-        }
-        Film film = filmStorage.getFilmById(filmId);
-        if (film.equals(null)) {
-            throw new FilmNotFoundException("Фильм с id " + filmId + " не найден");
-        }
+        User user = userStorage.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден"));
+        Film film = filmStorage.getFilmById(filmId)
+                .orElseThrow(() -> new FilmNotFoundException("Фильм с id " + filmId + " не найден"));
         film.deleteLike(userId);
         return film;
     }
@@ -70,7 +65,8 @@ public class InMemoryFilmService implements FilmService {
     }
 
     public Film updateFilm(Film film) throws FilmNotFoundException {
-        filmStorage.updateFilm(film);
+        filmStorage.updateFilm(film).orElseThrow(() -> new FilmNotFoundException("Фильм с id " + film.getId() + " " +
+                "не найден"));
         return film;
     }
 
@@ -83,6 +79,7 @@ public class InMemoryFilmService implements FilmService {
     }
 
     public Film getFilmById(long filmId) throws FilmNotFoundException {
-        return filmStorage.getFilmById(filmId);
+        return filmStorage.getFilmById(filmId).orElseThrow(
+                () -> new FilmNotFoundException("Фильм с id " + filmId + " не найден"));
     }
 }
