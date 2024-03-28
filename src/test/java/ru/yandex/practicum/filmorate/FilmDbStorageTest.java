@@ -25,8 +25,8 @@ class FilmDbStorageTest {
     @Test
     public void testFindFilmById() {
         int mpaId = mpaStorage.getMpaById(2).get().getId();
-        Film newFilm = Film.builder().
-                id(1L)
+        Film newFilm = Film.builder()
+                .id(1L)
                 .name("test Film")
                 .description("test description")
                 .releaseDate(LocalDate.of(1965, 1, 3))
