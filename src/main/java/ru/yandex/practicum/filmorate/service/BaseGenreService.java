@@ -8,9 +8,10 @@ import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
 import java.util.List;
 @Service
-public class BaseGenreService implements GenreService{
+public class BaseGenreService implements GenreService {
     private GenreStorage genreStorage;
-@Autowired
+
+    @Autowired
     public BaseGenreService(GenreStorage genreStorage) {
         this.genreStorage = genreStorage;
     }
@@ -37,8 +38,8 @@ public class BaseGenreService implements GenreService{
 
     @Override
     public Genre getGenreById(int genreId) throws GenreNotFoundException {
-    Genre genre = genreStorage.getGenreById(genreId)
-            .orElseThrow(() ->new GenreNotFoundException("Жанр с id " + genreId + " не найден"));
+        Genre genre = genreStorage.getGenreById(genreId)
+                .orElseThrow(() -> new GenreNotFoundException("Жанр с id " + genreId + " не найден"));
         return genre;
     }
 }

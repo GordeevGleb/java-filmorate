@@ -25,7 +25,6 @@ public class BaseFilmService implements FilmService {
     private LikeService likeService;
 
 
-
     @Override
     public void addLike(Long filmId, Long userId) {
         likeService.addLike(filmId, userId);
@@ -35,16 +34,16 @@ public class BaseFilmService implements FilmService {
     public void deleteLike(Long filmId, Long userId) {
         likeService.deleteLike(filmId, userId);
     }
+
     @Override
     public List<Film> getTopRatedFilms(Integer count) {
         List<Film> resultList;
-if (Optional.ofNullable(count).isEmpty()) {
-   resultList = filmStorage.getTopRatedFilms();
-}
-else {
-   resultList = filmStorage.getTopRatedFilms(count);
-}
-return resultList;
+        if (Optional.ofNullable(count).isEmpty()) {
+            resultList = filmStorage.getTopRatedFilms();
+        } else {
+            resultList = filmStorage.getTopRatedFilms(count);
+        }
+        return resultList;
     }
 
     public Film addFilm(Film film) {

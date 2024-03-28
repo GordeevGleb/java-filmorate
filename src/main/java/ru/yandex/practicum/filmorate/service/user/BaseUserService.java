@@ -16,22 +16,23 @@ public class BaseUserService implements UserService {
     @Qualifier("userStorage")
     private UserStorage userStorage;
     @Autowired
-private FriendService friendService;
-@Override
+    private FriendService friendService;
+
+    @Override
     public void addFriend(Long userId1, Long userId2) throws UserNotFoundException {
-    User user = userStorage.getUserById(userId1).
-            orElseThrow(() ->new UserNotFoundException("Пользователь не найден"));
-    User friend = userStorage.getUserById(userId2).
-            orElseThrow(() ->new UserNotFoundException("Пользователь не найден"));
-    friendService.addFriend(userId1, userId2);
+        User user = userStorage.getUserById(userId1).
+                orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        User friend = userStorage.getUserById(userId2).
+                orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        friendService.addFriend(userId1, userId2);
     }
 
     @Override
     public void deleteFriend(Long userId1, Long userId2) throws UserNotFoundException {
         User user = userStorage.getUserById(userId1).
-                orElseThrow(() ->new UserNotFoundException("Пользователь не найден"));
+                orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         User friend = userStorage.getUserById(userId2).
-                orElseThrow(() ->new UserNotFoundException("Пользователь не найден"));
+                orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         friendService.deleteFriend(userId1, userId2);
         userStorage.updateUser(user);
     }
@@ -71,6 +72,6 @@ private FriendService friendService;
     @Override
     public User getUserById(long userId) throws UserNotFoundException {
         return userStorage.getUserById(userId).
-                orElseThrow(()-> new UserNotFoundException("Пользователь с id " + userId + " не найден"));
+                orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден"));
     }
 }

@@ -12,7 +12,8 @@ import java.util.Optional;
 @Service
 public class BaseMpaService implements MpaService {
     private MpaStorage mpaStorage;
-@Autowired
+
+    @Autowired
     public BaseMpaService(MpaStorage mpaStorage) {
         this.mpaStorage = mpaStorage;
     }
@@ -39,8 +40,8 @@ public class BaseMpaService implements MpaService {
 
     @Override
     public Optional<Mpa> getMpaById(int mpaId) throws MpaNotFoundException {
-    Mpa mpa = mpaStorage.getMpaById(mpaId).
-            orElseThrow(() -> new MpaNotFoundException("Mpa с id " + mpaId + " не найден"));
+        Mpa mpa = mpaStorage.getMpaById(mpaId).
+                orElseThrow(() -> new MpaNotFoundException("Mpa с id " + mpaId + " не найден"));
         return Optional.ofNullable(mpa);
     }
 }
