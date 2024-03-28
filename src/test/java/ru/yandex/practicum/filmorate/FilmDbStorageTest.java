@@ -19,7 +19,9 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 class FilmDbStorageTest {
 
     private final JdbcTemplate jdbcTemplate;
+    @Autowired
     private MpaStorage mpaStorage;
+    @Autowired
     private GenreStorage genreStorage;
 
     @Test

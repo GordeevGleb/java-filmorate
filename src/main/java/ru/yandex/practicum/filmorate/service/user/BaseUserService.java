@@ -35,7 +35,6 @@ public class BaseUserService implements UserService {
         User friend = userStorage.getUserById(userId2)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         friendService.deleteFriend(userId1, userId2);
-        userStorage.updateUser(user);
     }
 
     @Override

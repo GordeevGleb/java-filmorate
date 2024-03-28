@@ -38,33 +38,3 @@ create table if not exists USERS
     constraint USERS_PK
         primary key (USER_ID)
 );
-
-create table if not exists FILM_GENRE
-(
-    FILM_ID  BIGINT,
-    GENRE_ID INTEGER,
-    constraint FILM_GENRE_FILMS_FILM_ID_FK
-        foreign key (FILM_ID) references FILMS,
-    constraint FILM_GENRE_GENRES_GENRE_ID_FK
-        foreign key (GENRE_ID) references GENRES
-);
-
-create table if not exists FRIENDSHIPS
-(
-    USER_ID   BIGINT,
-    FRIEND_ID BIGINT,
-    constraint FRIENDSHIP_USERS_USER_ID_FK
-        foreign key (USER_ID) references USERS,
-    constraint FRIENDSHIP_USERS_USER_ID_FK_2
-        foreign key (FRIEND_ID) references USERS
-);
-
-create table if not exists LIKES
-(
-    USER_ID BIGINT,
-    FILM_ID BIGINT,
-    constraint LIKES_FILMS_FILM_ID_FK
-        foreign key (FILM_ID) references FILMS,
-    constraint LIKES_USERS_USER_ID_FK
-        foreign key (USER_ID) references USERS
-);

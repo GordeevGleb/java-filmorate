@@ -32,7 +32,6 @@ public class Film {
     @Positive(message = "Длительность фильма не может быть отрицательной")
     private Long duration;
     private Mpa mpa;
-    @JsonIgnore
     private List<Genre> genres = new ArrayList<>();
     @JsonIgnore
     private List<Long> likes = new ArrayList<>();
