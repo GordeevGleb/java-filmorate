@@ -21,6 +21,7 @@ import java.util.Optional;
 public class UserDbStorage implements UserStorage, RowMapper<User> {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public User addUser(User user) {
             String sqlQuery = "insert into USERS(USER_EMAIL, USER_LOGIN, USER_NAME, USER_BIRTHDAY)" +
@@ -50,8 +51,7 @@ public class UserDbStorage implements UserStorage, RowMapper<User> {
                 user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
         if (updateCount != 0) {
             return Optional.of(user);
-        }
-        else {
+        } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
     }
