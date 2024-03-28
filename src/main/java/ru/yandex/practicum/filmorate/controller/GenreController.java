@@ -17,20 +17,22 @@ import java.util.List;
 @Slf4j
 public class GenreController {
     private final GenreService genreService;
+
     @Autowired
     public GenreController(GenreService genreService) {
         this.genreService = genreService;
     }
+
     @GetMapping("/genres")
     public List<Genre> getAll() {
         return genreService.getAllGenres();
     }
+
     @GetMapping("/genres/{genreId}")
     public Genre getById(@PathVariable int genreId) throws GenreNotFoundException {
         try {
             return genreService.getGenreById(genreId);
-        }
-        catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             throw new GenreNotFoundException("Жанр с указанным в запросе id не найден");
         }
     }
