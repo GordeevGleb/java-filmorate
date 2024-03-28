@@ -33,6 +33,7 @@ class FilmDbStorageTest {
                 .duration(123L)
                 .build();
         FilmDbStorage userStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, genreStorage);
+        newFilm.setMpa(mpaStorage.getMpaById(mpaId).get());
         userStorage.addFilm(newFilm);
 
         Film savedFilm = userStorage.getFilmById(1).get();
