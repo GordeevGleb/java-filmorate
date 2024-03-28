@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.dao.GenreDbStorage;
-import ru.yandex.practicum.filmorate.dao.MpaDbStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
 
@@ -18,7 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GenreDbStorageTest {
+
     private final JdbcTemplate jdbcTemplate;
+
     @Test
     public void testGenreDb() {
         GenreDbStorage genreDbStorage = new GenreDbStorage(jdbcTemplate);
@@ -26,7 +26,7 @@ public class GenreDbStorageTest {
         assertThat(allGenres).isNotNull();
         int size = genreDbStorage.getAllGenres().size();
         assertEquals(size, allGenres.size());
-        Genre genreFromStorage =genreDbStorage.getGenreById(3).get();
+        Genre genreFromStorage = genreDbStorage.getGenreById(3).get();
         Genre genreFromList = allGenres.get(2);
         assertEquals(genreFromList, genreFromStorage);
     }

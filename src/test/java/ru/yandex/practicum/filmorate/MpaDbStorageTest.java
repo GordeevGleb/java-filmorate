@@ -6,12 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.dao.MpaDbStorage;
-import ru.yandex.practicum.filmorate.dao.UserDbStorage;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -20,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class MpaDbStorageTest {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Test

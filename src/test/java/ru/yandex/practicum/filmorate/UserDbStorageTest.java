@@ -9,16 +9,15 @@ import ru.yandex.practicum.filmorate.dao.UserDbStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserDbStorageTest {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Test
@@ -33,6 +32,7 @@ class UserDbStorageTest {
                 .usingRecursiveComparison()
                 .isEqualTo(newUser);
     }
+
     @Test
     public void testGetAllUsers() {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
@@ -44,6 +44,7 @@ class UserDbStorageTest {
         assertThat(users).isNotNull();
         assertEquals(newUser, userDbStorage.getUserById(newUser.getId()).get());
     }
+
     @Test
     public void testUpdateUser() {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
@@ -56,6 +57,7 @@ class UserDbStorageTest {
         User savedUser = userDbStorage.getUserById(newUser.getId()).get();
         assertEquals(savedUser.getName(), "test Name");
     }
+
     @Test
     public void testAddAndDeleteUser() {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
