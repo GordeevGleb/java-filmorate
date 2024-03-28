@@ -16,6 +16,7 @@ import java.util.Optional;
 @Repository
 public class MpaDbStorage implements MpaStorage, RowMapper<Mpa> {
     private final JdbcTemplate jdbcTemplate;
+
 @Autowired
     public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -53,6 +54,7 @@ public class MpaDbStorage implements MpaStorage, RowMapper<Mpa> {
     String sqlQuery = "select MPA_ID, MPA_NAME from MPA where MPA_ID = ?";
         return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, this::mapRow, mpaId));
     }
+
     @Override
     public Mpa mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
