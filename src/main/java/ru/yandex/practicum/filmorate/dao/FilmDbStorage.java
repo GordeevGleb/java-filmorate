@@ -25,6 +25,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
     private final JdbcTemplate jdbcTemplate;
     private final MpaStorage mpaStorage;
     private final GenreStorage genreStorage;
+
 @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaStorage mpaStorage, GenreStorage genreStorage) {
         this.jdbcTemplate = jdbcTemplate;
@@ -59,13 +60,12 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
         String sqlQuery = "update FILMS set FILM_TITLE = ?, FILM_DESCRIPTION = ?, FILM_RELEASE_DATE = ?," +
                 "FILM_DURATION = ?, FILM_MPA_ID = ? where FILM_ID = ?";
         int updateCount = jdbcTemplate.update(sqlQuery,
-                film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration()
-        , film.getMpa().getId(), film.getId());
+                film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
+        film.getMpa().getId(), film.getId());
         if (updateCount != 0) {
             film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()).get());
             return Optional.of(film);
-        }
-        else {
+        } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
         }
     }
