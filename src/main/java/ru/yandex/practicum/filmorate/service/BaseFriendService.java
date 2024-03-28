@@ -20,46 +20,29 @@ public class BaseFriendService implements FriendService {
 
     @Override
     public void addFriend(Long userId, Long friendId) throws UserNotFoundException {
-        String sqlQuery = "insert into FRIENDSHIPS(USER_ID, FRIEND_ID, IS_FRIEND) VALUES(?, ?, ?)";
-        jdbcTemplate.update(sqlQuery, userId, friendId, false);
-//        if (wasFriendBefore(friendId, userId)) {
-//            jdbcTemplate.update("update FRIENDSHIPS" +
-//                    " set IS_FRIEND = true where USER_ID = ? AND FRIEND_ID = ?", friendId, userId, true);
-//            jdbcTemplate.update("update FRIENDSHIPS" +
-//                    " set IS_FRIEND = true where USER_ID = ? AND FRIEND_ID = ?", friendId, userId);
-//        }
+        String sqlQuery = "insert into FRIENDSHIPS(USER_ID, FRIEND_ID) VALUES(?, ?)";
+        jdbcTemplate.update(sqlQuery, userId, friendId);
+//        String sqlQuery1 = "insert into FRIENDSHIPS(USER_ID, FRIEND_ID) VALUES(?, ?)";
+//        jdbcTemplate.update(sqlQuery1, friendId, userId);
     }
 
     @Override
     public List<Long> getFriends(Long userId) {
-        String sqlSquery = "select USERS.USER_ID from USERS join FRIENDSHIPS on USERS.USER_ID = FRIENDSHIPS.FRIEND_ID";
-        return jdbcTemplate.queryForList(sqlSquery, Long.class);
+        String sqlSquery = "select FRIEND_ID from FRIENDSHIPS where USER_ID =?";
+        return jdbcTemplate.queryForList(sqlSquery, Long.class, userId);
     }
 
     @Override
-    public void deleteFriend(Long userId, Long friendId) throws UserNotFoundException {
+    public void deleteFriend(Long userId, Long friendId) {
         String sqlQuery = "delete from FRIENDSHIPS where USER_ID = ? AND FRIEND_ID = ?";
         jdbcTemplate.update(sqlQuery, userId, friendId);
-//        User user = userService.getUserById(userId);
-//        user.getFriends().remove(friendId);
-//        if (wasFriendBefore(friendId, userId)) {
-//            jdbcTemplate.update("update FRIENDSHIPS set IS_FRIEND = false where USER_ID =? AND FRIEND_ID = ?", friendId);
-//        }
     }
 
     @Override
     public List<Long> getMutualFriends(Long userId1, Long userId2) {
-        String sqlQuery = "select * from (select u.USER_ID from USERS as u left join" +
-                " FRIENDSHIPS as F on f.FRIEND_ID = u.USER_ID where f.IS_FRIEND = true and u.USER_ID = ?)" +
-                " as list1 inner join(select u.USER_ID from USERS as u left join FRIENDSHIPS as f on f.FRIEND_ID = u.USER_ID " +
-                "where f.IS_FRIEND = true and u.USER_ID = ?) as list2 on list1.USER_ID = list2.USER_ID";
-        return jdbcTemplate.queryForList(sqlQuery, Long.class);
+        String sqlQuery = "select f2.USER_ID as COMMON_FRIEND from FRIENDSHIPS f1 join FRIENDSHIPS f2" +
+                " on f1.FRIEND_ID = f2.FRIEND_ID where f1.USER_ID = ? AND f2.USER_ID = ?";
+        return jdbcTemplate.queryForList(sqlQuery, Long.class, userId1, userId2);
     }
-
-//    @Override
-//    public void wasFriendsBefore(Long user, Long friend) {
-//        String sqlQuery = "update FRIENDSHIPS set IS_FRIEND = true where USER_ID =? AND FRIEND_ID = ?";
-//        jdbcTemplate.update(sqlQuery, user, friend);
-//    }
 }
 

@@ -62,7 +62,7 @@ public class UserDbStorage implements UserStorage, RowMapper<User> {
     public List<User> getAllUsers() {
         String sqlQuery = "select USERS.USER_ID, USERS.USER_EMAIL, USERS.USER_LOGIN, USERS.USER_NAME," +
                 " USERS.USER_BIRTHDAY" +
-                " from USERS inner join FRIENDSHIPS F on USERS.USER_ID = F.USER_ID";
+                " from USERS";
         return jdbcTemplate.query(sqlQuery, this::mapRow);
     }
 
@@ -75,8 +75,6 @@ public class UserDbStorage implements UserStorage, RowMapper<User> {
 
     @Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        String friendsQuery = "select USERS.USER_ID from USERS join FRIENDSHIPS on USERS.USER_ID = FRIENDSHIPS.USER_ID " +
-                "where USERS.USER_ID = FRIENDSHIPS.FRIEND_ID";
         User user = User.builder()
                 .id(rs.getLong(1))
                 .email(rs.getString(2))
@@ -84,7 +82,6 @@ public class UserDbStorage implements UserStorage, RowMapper<User> {
                 .name(rs.getString(4))
                 .birthday(rs.getDate(5).toLocalDate())
                 .build();
-        user.setFriends(jdbcTemplate.queryForList(friendsQuery, Long.class));
         return user;
     }
 }

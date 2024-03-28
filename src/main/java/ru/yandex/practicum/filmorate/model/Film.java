@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,8 @@ public class Film {
     @Positive(message = "Длительность фильма не может быть отрицательной")
     private Long duration;
     private Mpa mpa;
+    @JsonIgnore
     private List<Genre> genres = new ArrayList<>();
+    @JsonIgnore
     private List<Long> likes = new ArrayList<>();
 }

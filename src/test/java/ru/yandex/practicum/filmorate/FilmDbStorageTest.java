@@ -21,13 +21,19 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmDbStorageTest {
     private final JdbcTemplate jdbcTemplate;
-    private final MpaStorage mpaStorage;
-    private final GenreStorage genreStorage;
+    private MpaStorage mpaStorage;
+    private GenreStorage genreStorage;
 
     @Test
     public void testFindFilmById() {
-
-        Film newFilm = new Film();
+int mpaId = mpaStorage.getMpaById(2).get().getId();
+        Film newFilm = Film.builder().
+                id(1L)
+                .name("test Film")
+                .description("test description")
+                .releaseDate(LocalDate.of(1965, 1, 3))
+                .duration(123L)
+        .build();
         FilmDbStorage userStorage = new FilmDbStorage(jdbcTemplate, mpaStorage, genreStorage);
         userStorage.addFilm(newFilm);
 

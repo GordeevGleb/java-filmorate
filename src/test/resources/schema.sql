@@ -53,7 +53,6 @@ create table if not exists FRIENDSHIPS
 (
     USER_ID   BIGINT,
     FRIEND_ID BIGINT,
-    IS_FRIEND BOOLEAN,
     constraint FRIENDSHIP_USERS_USER_ID_FK
         foreign key (USER_ID) references USERS,
     constraint FRIENDSHIP_USERS_USER_ID_FK_2

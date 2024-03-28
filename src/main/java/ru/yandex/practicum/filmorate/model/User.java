@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
@@ -37,5 +38,4 @@ public class User {
     @NotNull(message = "Дата рождения не существует")
     @Past(message = "Некорректная дата рождения")
     private LocalDate birthday;
-    private List<Long> friends = new ArrayList<>();
 }

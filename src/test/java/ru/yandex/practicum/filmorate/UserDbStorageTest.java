@@ -24,7 +24,7 @@ class UserDbStorageTest {
     @Test
     public void testFindUserById() {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
-                LocalDate.of(1990, 1, 1), new ArrayList<>());
+                LocalDate.of(1990, 1, 1));
         UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
         userStorage.addUser(newUser);
         User savedUser = userStorage.getUserById(1).get();
@@ -36,7 +36,7 @@ class UserDbStorageTest {
     @Test
     public void testGetAllUsers() {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
-                LocalDate.of(1990, 1, 1), new ArrayList<>());
+                LocalDate.of(1990, 1, 1));
         UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
         userDbStorage.addUser(newUser);
         List<User> users = userDbStorage.getAllUsers();
@@ -47,11 +47,11 @@ class UserDbStorageTest {
     @Test
     public void testUpdateUser() {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
-                LocalDate.of(1990, 1, 1), new ArrayList<>());
+                LocalDate.of(1990, 1, 1));
         UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
         userDbStorage.addUser(newUser);
         userDbStorage.updateUser(new User(1L, "123@yandex.com", "testLogin", "test Name",
-                LocalDate.of(1965, 1, 2), new ArrayList<>()));
+                LocalDate.of(1965, 1, 2)));
         assertNotNull(userDbStorage.getUserById(newUser.getId()));
         User savedUser = userDbStorage.getUserById(newUser.getId()).get();
         assertEquals(savedUser.getName(), "test Name");
@@ -59,7 +59,7 @@ class UserDbStorageTest {
     @Test
     public void testAddAndDeleteUser() {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
-                LocalDate.of(1990, 1, 1), new ArrayList<>());
+                LocalDate.of(1990, 1, 1));
         UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
         userDbStorage.addUser(newUser);
         assertThat(userDbStorage).isNotNull();
