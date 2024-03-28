@@ -41,8 +41,8 @@ public class BaseMpaService implements MpaService {
 
     @Override
     public Optional<Mpa> getMpaById(int mpaId) throws MpaNotFoundException {
-        Mpa mpa = mpaStorage.getMpaById(mpaId).
-                orElseThrow(() -> new MpaNotFoundException("Mpa с id " + mpaId + " не найден"));
+        Mpa mpa = mpaStorage.getMpaById(mpaId)
+                .orElseThrow(() -> new MpaNotFoundException("Mpa с id " + mpaId + " не найден"));
         return Optional.ofNullable(mpa);
     }
 }
