@@ -25,6 +25,7 @@ public class ErrorHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
     @ExceptionHandler
     public ResponseEntity<Map<String, String>> handleMpaNotFoundException(final MpaNotFoundException e) {
         return new ResponseEntity<>(
@@ -32,6 +33,7 @@ public class ErrorHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
     @ExceptionHandler
     public ResponseEntity<Map<String, String>> handleGenreNotFoundException(final GenreNotFoundException e) {
         return new ResponseEntity<>(
