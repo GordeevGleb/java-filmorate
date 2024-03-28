@@ -2,12 +2,14 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.LikeService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import javax.validation.Valid;
 import java.util.*;
@@ -50,11 +52,10 @@ public class FilmController {
     }
 
     @PutMapping("/films/{filmId}/like/{userId}")
-    public Film setLike(@PathVariable Long filmId, @PathVariable Long userId) throws UserNotFoundException,
+    @ResponseStatus(HttpStatus.OK)
+    public void setLike(@PathVariable Long filmId, @PathVariable Long userId) throws UserNotFoundException,
             FilmNotFoundException {
-        Film film = filmService.getFilmById(filmId);
         filmService.addLike(filmId, userId);
-        return film;
     }
 
     @DeleteMapping("/films/{filmId}/like/{userId}")
@@ -67,11 +68,7 @@ public class FilmController {
 
     @GetMapping("/films/popular")
     public List<Film> getTopRatedFilms(@RequestParam(required = false) Integer count) {
-        if (Optional.ofNullable(count).isEmpty()) {
-            return filmService.getTopRatedFilms(0);
-        } else {
-            return filmService.getTopRatedFilms(count);
-        }
+       return filmService.getTopRatedFilms(count);
     }
 }
 

@@ -18,4 +18,6 @@ public interface FilmStorage {
     public List<Film> getAllFilms();
 
     public Optional<Film> getFilmById(long filmId) throws FilmNotFoundException;
+    public List<Film> getTopRatedFilms(Integer count);
+    public List<Film> getTopRatedFilms();
 }

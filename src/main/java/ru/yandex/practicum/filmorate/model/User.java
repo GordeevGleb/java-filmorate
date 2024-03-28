@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -35,17 +37,5 @@ public class User {
     @NotNull(message = "Дата рождения не существует")
     @Past(message = "Некорректная дата рождения")
     private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
-
-
-
-    public Set<Long> addFriend(Long friendId) {
-        friends.add(friendId);
-        return friends;
-    }
-
-    public Set<Long> removeFriend(Long friendId) {
-        friends.remove(friendId);
-        return friends;
-    }
+    private List<Long> friends = new ArrayList<>();
 }

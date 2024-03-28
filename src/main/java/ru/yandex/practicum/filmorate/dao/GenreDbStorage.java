@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Component
 @Repository
-public class GenreDbStorage implements GenreStorage {
+public class GenreDbStorage implements GenreStorage, RowMapper<Genre> {
     private final JdbcTemplate jdbcTemplate;
 @Autowired
     public GenreDbStorage(JdbcTemplate jdbcTemplate) {
@@ -40,7 +40,7 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public List<Genre> getAllGenres() {
         String sqlQuery = "select GENRE_ID, GENRE_NAME from GENRES";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
+        return jdbcTemplate.query(sqlQuery, this::mapRow);
     }
 
     @Override
@@ -53,12 +53,14 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public Optional<Genre> getGenreById(int genreId) {
         String sqlQuery = "select GENRE_ID, GENRE_NAME from GENRES where GENRE_ID = ?";
-        return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, genreId));
+        return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRow, genreId));
     }
-    private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
+
+    @Override
+    public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
-                .id(resultSet.getInt(1))
-                .name(resultSet.getString(2))
+                .id(rs.getInt(1))
+                .name(rs.getString(2))
                 .build();
     }
 }

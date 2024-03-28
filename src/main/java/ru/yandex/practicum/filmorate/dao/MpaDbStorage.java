@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Component
 @Repository
-public class MpaDbStorage implements MpaStorage {
+public class MpaDbStorage implements MpaStorage, RowMapper<Mpa> {
     private final JdbcTemplate jdbcTemplate;
 @Autowired
     public MpaDbStorage(JdbcTemplate jdbcTemplate) {
@@ -39,7 +39,7 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public List<Mpa> getAllMpa() {
     String sqlQuery = "select MPA_ID, MPA_NAME from MPA";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToMpa);
+        return jdbcTemplate.query(sqlQuery, this::mapRow);
     }
 
     @Override
@@ -52,12 +52,13 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public Optional<Mpa> getMpaById(int mpaId) {
     String sqlQuery = "select MPA_ID, MPA_NAME from MPA where MPA_ID = ?";
-        return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpa, mpaId));
+        return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, this::mapRow, mpaId));
     }
-    private Mpa mapRowToMpa(ResultSet resultSet, int rowNum) throws SQLException {
+    @Override
+    public Mpa mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Mpa.builder()
-                .id(resultSet.getInt(1))
-                .name(resultSet.getString(2))
+                .id(rs.getInt(1))
+                .name(rs.getString(2))
                 .build();
     }
 }

@@ -49,28 +49,25 @@ public class UserController {
     }
 
     @PutMapping("/users/{userId}/friends/{friendId}")
-    public List<Long> addFriend(@PathVariable long userId,
-                                @PathVariable long friendId) throws UserNotFoundException {
-        User user = userService.getUserById(userId);
+    public void addFriend(@PathVariable Long userId,
+                                @PathVariable Long friendId) throws UserNotFoundException {
         userService.addFriend(userId, friendId);
-        return new ArrayList<>(user.getFriends());
+
     }
 
     @DeleteMapping("/users/{userId}/friends/{friendId}")
-    public List<Long> deleteFriend(@PathVariable long userId,
-                                   @PathVariable long friendId) throws UserNotFoundException {
-        User user = userService.getUserById(userId);
+    public void deleteFriend(@PathVariable Long userId,
+                                   @PathVariable Long friendId) throws UserNotFoundException {
         userService.deleteFriend(userId, friendId);
-        return new ArrayList<>(user.getFriends());
     }
 
     @GetMapping("/users/{userId}/friends")
-    public List<User> getAllUsersFriends(@PathVariable Long userId) throws UserNotFoundException {
+    public List<Long> getAllUsersFriends(@PathVariable Long userId) throws UserNotFoundException {
         return userService.getUsersFriends(userId);
     }
 
     @GetMapping("/users/{userId}/friends/common/{friendId}")
-    public List<User> getMutualFriends(@PathVariable Long userId,
+    public List<Long> getMutualFriends(@PathVariable Long userId,
                                        @PathVariable Long friendId) throws UserNotFoundException {
         return userService.getMutualFriends(userId, friendId);
     }

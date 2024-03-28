@@ -6,8 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.util.MinimumDate;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,18 +34,7 @@ public class Film {
     private LocalDate releaseDate;
     @Positive(message = "Длительность фильма не может быть отрицательной")
     private Long duration;
-    private List<Integer> genresId = new ArrayList<>();
     private Mpa mpa;
-    private Set<Genre> genres;
-    private Set<Long> usersLike = new HashSet<>();
-
-    public Set<Long> addLike(Long userId) {
-        usersLike.add(userId);
-        return usersLike;
-    }
-
-    public Set<Long> deleteLike(Long userId) {
-        usersLike.remove(userId);
-        return usersLike;
-    }
+    private List<Genre> genres = new ArrayList<>();
+    private List<Long> likes = new ArrayList<>();
 }

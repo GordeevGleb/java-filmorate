@@ -55,6 +55,23 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Optional.of(currentFilm);
     }
 
+    @Override
+    public List<Film> getTopRatedFilms(Integer count) {
+        List<Film> resultList = new ArrayList<>(films.values());
+        resultList.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
+        if (count > resultList.size()) {
+            return resultList;
+        }
+        else return resultList.subList(0, count);
+    }
+
+    @Override
+    public List<Film> getTopRatedFilms() {
+        List<Film> resultList = new ArrayList<>(films.values());
+        resultList.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
+        return resultList.subList(0, 10);
+    }
+
     private long generateId() {
         return ++maxId;
     }

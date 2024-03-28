@@ -7,13 +7,11 @@ import java.util.List;
 
 
 public interface UserService {
-    public List<Long> addFriend(long userId1, long userId2) throws UserNotFoundException;
+    void addFriend(Long userId, Long friendId) throws UserNotFoundException;
+    void deleteFriend(Long userId, Long friendId) throws UserNotFoundException;
+    List<Long> getUsersFriends(Long userId);
 
-    public List<Long> deleteFriend(long userId1, long userId2) throws UserNotFoundException;
-
-    public List<User> getMutualFriends(long userId1, long userId2) throws UserNotFoundException;
-
-    public List<User> getUsersFriends(long userId) throws UserNotFoundException;
+    List<Long> getMutualFriends(Long userId1, Long userId2);
 
     public User addUser(User user);
 
