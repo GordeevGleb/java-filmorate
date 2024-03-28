@@ -2,11 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import java.util.List;
 @Service
@@ -22,8 +19,6 @@ public class BaseFriendService implements FriendService {
     public void addFriend(Long userId, Long friendId) throws UserNotFoundException {
         String sqlQuery = "insert into FRIENDSHIPS(USER_ID, FRIEND_ID) VALUES(?, ?)";
         jdbcTemplate.update(sqlQuery, userId, friendId);
-//        String sqlQuery1 = "insert into FRIENDSHIPS(USER_ID, FRIEND_ID) VALUES(?, ?)";
-//        jdbcTemplate.update(sqlQuery1, friendId, userId);
     }
 
     @Override

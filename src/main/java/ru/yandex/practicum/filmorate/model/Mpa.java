@@ -3,9 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Embeddable;
-import javax.persistence.OneToOne;
 
 @Component
 @Builder

@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.LikeService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import javax.validation.Valid;
 import java.util.*;
@@ -53,8 +52,7 @@ public class FilmController {
 
     @PutMapping("/films/{filmId}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void setLike(@PathVariable Long filmId, @PathVariable Long userId) throws UserNotFoundException,
-            FilmNotFoundException {
+    public void setLike(@PathVariable Long filmId, @PathVariable Long userId) {
         filmService.addLike(filmId, userId);
     }
 
