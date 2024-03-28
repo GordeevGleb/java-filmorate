@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 
 import java.util.List;
+
 @Service
 public class BaseFriendService implements FriendService {
 
