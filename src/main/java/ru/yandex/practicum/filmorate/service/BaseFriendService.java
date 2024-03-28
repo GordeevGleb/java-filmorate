@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import java.util.List;
 @Service
 public class BaseFriendService implements FriendService {
+
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired

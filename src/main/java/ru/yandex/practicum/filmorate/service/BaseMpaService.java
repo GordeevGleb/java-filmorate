@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Service
 public class BaseMpaService implements MpaService {
+
     private MpaStorage mpaStorage;
 
     @Autowired

@@ -12,6 +12,7 @@ import java.util.List;
 
 @Service
 public class BaseUserService implements UserService {
+
     @Autowired
     @Qualifier("userStorage")
     private UserStorage userStorage;

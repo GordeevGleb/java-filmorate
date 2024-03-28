@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.List;
 
 public interface GenreService {
+
     public Genre addGenre(Genre genre);
 
     public Genre updateGenre(Genre genre);

@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Component
 public interface FilmStorage {
+
     public Film addFilm(Film film);
 
     public Film deleteFilm(long filmId);

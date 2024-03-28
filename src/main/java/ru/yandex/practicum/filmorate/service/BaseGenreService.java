@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import java.util.List;
 @Service
 public class BaseGenreService implements GenreService {
+
     private GenreStorage genreStorage;
 
     @Autowired

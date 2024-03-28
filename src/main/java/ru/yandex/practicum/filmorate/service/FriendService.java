@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import java.util.List;
 
 public interface FriendService {
+
     void addFriend(Long userId, Long friendId) throws UserNotFoundException;
 
     List<Long> getFriends(Long userId);
