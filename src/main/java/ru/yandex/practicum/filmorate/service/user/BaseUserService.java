@@ -21,19 +21,19 @@ public class BaseUserService implements UserService {
 
     @Override
     public void addFriend(Long userId1, Long userId2) throws UserNotFoundException {
-        User user = userStorage.getUserById(userId1).
-                orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-        User friend = userStorage.getUserById(userId2).
-                orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        User user = userStorage.getUserById(userId1)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        User friend = userStorage.getUserById(userId2)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         friendService.addFriend(userId1, userId2);
     }
 
     @Override
     public void deleteFriend(Long userId1, Long userId2) throws UserNotFoundException {
-        User user = userStorage.getUserById(userId1).
-                orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-        User friend = userStorage.getUserById(userId2).
-                orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        User user = userStorage.getUserById(userId1)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+        User friend = userStorage.getUserById(userId2)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         friendService.deleteFriend(userId1, userId2);
         userStorage.updateUser(user);
     }
@@ -55,8 +55,8 @@ public class BaseUserService implements UserService {
 
     @Override
     public User updateUser(User user) throws UserNotFoundException {
-        userStorage.updateUser(user).
-                orElseThrow(() -> new UserNotFoundException("Пользователь " + user.getLogin() + " не найден"));
+        userStorage.updateUser(user)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь " + user.getLogin() + " не найден"));
         return user;
     }
 
@@ -72,7 +72,7 @@ public class BaseUserService implements UserService {
 
     @Override
     public User getUserById(long userId) throws UserNotFoundException {
-        return userStorage.getUserById(userId).
-                orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден"));
+        return userStorage.getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден"));
     }
 }
