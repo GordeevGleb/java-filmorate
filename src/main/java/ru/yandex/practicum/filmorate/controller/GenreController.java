@@ -33,7 +33,7 @@ public class GenreController {
 
     @GetMapping("/genres/{genreId}")
     public Genre getById(@PathVariable int genreId) throws GenreNotFoundException {
-        log.info("Поиск жанра по его идентификатору: " +genreId);
+        log.info("Поиск жанра по его идентификатору: " + genreId);
         try {
             Genre genre = genreService.getGenreById(genreId);
             log.info("Жанр по идентификатору " + genreId + " получен! Это " + genre.getName());
