@@ -19,5 +19,6 @@ public interface UserStorage extends FriendService {
     public List<User> getAllUsers();
 
     public Optional<User> getUserById(long userId) throws UserNotFoundException;
+
     public User mapRow(ResultSet rs, int rowNum) throws SQLException;
 }
