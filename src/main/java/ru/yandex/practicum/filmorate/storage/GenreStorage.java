@@ -16,5 +16,6 @@ public interface GenreStorage {
     public Genre deleteGenre(int genreId);
 
     public Optional<Genre> getGenreById(int genreId);
+
 public List<Genre> getGenresByFilmId(Long filmId);
 }
