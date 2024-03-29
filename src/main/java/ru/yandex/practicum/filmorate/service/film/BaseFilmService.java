@@ -22,9 +22,11 @@ public class BaseFilmService implements FilmService {
     @Autowired
     @Qualifier("userStorage")
     private UserStorage userStorage;
+
     @Autowired
     @Qualifier("filmStorage")
     private FilmStorage filmStorage;
+
     @Autowired
     private LikeService likeService;
 

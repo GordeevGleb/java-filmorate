@@ -37,6 +37,7 @@ public class Film {
     private List<Genre> genres = new ArrayList<>();
     @JsonIgnore
     private List<Long> likes = new ArrayList<>();
+
     public Map<String, Object> toMap() {
         Map<String, Object> values = new HashMap<>();
         values.put("FILM_TITLE", name);
