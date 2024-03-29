@@ -42,7 +42,7 @@ public class BaseUserService implements UserService {
     @Override
     public List<User> getUsersFriends(Long userId) throws UserNotFoundException {
         User user = userStorage.getUserById(userId)
-                .orElseThrow(() ->new UserNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
 
         return userStorage.getFriends(userId);
     }
