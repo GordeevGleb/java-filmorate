@@ -77,7 +77,7 @@ public class UserController {
                                    @PathVariable Long friendId) throws UserNotFoundException {
         log.info("Запрос на удаление друга " + friendId + " пользователем " + userId);
         userService.deleteFriend(userId, friendId);
-        log.info("Пользователь " +friendId + " удален из списка друзей " + userId);
+        log.info("Пользователь " + friendId + " удален из списка друзей " + userId);
     }
 
     @GetMapping("/users/{userId}/friends")
