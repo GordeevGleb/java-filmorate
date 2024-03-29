@@ -8,7 +8,9 @@ import ru.yandex.practicum.filmorate.util.MinimumDate;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -35,4 +37,13 @@ public class Film {
     private List<Genre> genres = new ArrayList<>();
     @JsonIgnore
     private List<Long> likes = new ArrayList<>();
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("FILM_TITLE", name);
+        values.put("FILM_DESCRIPTION", description);
+        values.put("FILM_RELEASE_DATE", releaseDate);
+        values.put("FILM_DURATION", duration);
+        values.put("FILM_MPA_ID", mpa.getId());
+        return values;
+    }
 }

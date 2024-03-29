@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ class UserDbStorageTest {
     private final JdbcTemplate jdbcTemplate;
 
     @Test
-    public void testFindUserById() {
+    public void testFindUserById() throws UserNotFoundException {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
         UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
@@ -36,7 +37,7 @@ class UserDbStorageTest {
     }
 
     @Test
-    public void testGetAllUsers() {
+    public void testGetAllUsers() throws UserNotFoundException {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
         UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
@@ -48,7 +49,7 @@ class UserDbStorageTest {
     }
 
     @Test
-    public void testUpdateUser() {
+    public void testUpdateUser() throws UserNotFoundException {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
         UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
@@ -61,7 +62,7 @@ class UserDbStorageTest {
     }
 
     @Test
-    public void testAddAndDeleteUser() {
+    public void testAddAndDeleteUser() throws UserNotFoundException {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
         UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);

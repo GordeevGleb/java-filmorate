@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Component
@@ -33,4 +35,12 @@ public class User {
     @NotNull(message = "Дата рождения не существует")
     @Past(message = "Некорректная дата рождения")
     private LocalDate birthday;
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("USER_EMAIL", email);
+        values.put("USER_LOGIN", login);
+        values.put("USER_NAME", name);
+        values.put("USER_BIRTHDAY", birthday);
+        return values;
+    }
 }

@@ -56,10 +56,19 @@ public class GenreDbStorage implements GenreStorage, RowMapper<Genre> {
     }
 
     @Override
+    public List<Genre> getGenresByFilmId(Long filmId) {
+        String sqlQuery = "select distinct G.GENRE_ID, G.GENRE_NAME from FILM_GENRE AS FG" +
+                "    left join GENRES AS G ON FG.GENRE_ID = G.GENRE_ID\n" +
+                "    where FILM_ID = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRow, filmId);
+    }
+
+
     public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(rs.getInt(1))
                 .name(rs.getString(2))
                 .build();
     }
+
 }

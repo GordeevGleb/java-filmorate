@@ -11,9 +11,9 @@ public interface UserService {
 
     void deleteFriend(Long userId, Long friendId) throws UserNotFoundException;
 
-    List<Long> getUsersFriends(Long userId);
+    List<User> getUsersFriends(Long userId) throws UserNotFoundException;
 
-    List<Long> getMutualFriends(Long userId1, Long userId2);
+    List<User> getMutualFriends(Long userId1, Long userId2) throws UserNotFoundException;
 
     public User addUser(User user);
 

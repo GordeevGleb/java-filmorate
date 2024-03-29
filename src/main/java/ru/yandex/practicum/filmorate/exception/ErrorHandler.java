@@ -41,4 +41,20 @@ public class ErrorHandler {
                 HttpStatus.NOT_FOUND
         );
     }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleIncorrectMpaException(final IncorrectMpaException e) {
+        return new ResponseEntity<>(
+                Map.of("Ошибка", e.getMessage()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleIncorrectGenreException(final IncorrectGenreException e) {
+        return new ResponseEntity<>(
+                Map.of("Ошибка", e.getMessage()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
 }

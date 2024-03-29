@@ -24,13 +24,19 @@ public class MpaController {
 
     @GetMapping("/mpa")
     public List<Mpa> getAll() {
-        return mpaService.getAllMpa();
+        log.info("Получен запрос на вывод всех MPA-рейтингов");
+        List<Mpa> allMpas = mpaService.getAllMpa();
+        log.info("Список всех MPA-рейтингов получен");
+        return allMpas;
     }
 
     @GetMapping("/mpa/{mpaId}")
     public Mpa getById(@PathVariable int mpaId) throws MpaNotFoundException {
+        log.info("Поиск MPA-рейтинга по идентификатору " + mpaId);
         try {
-            return mpaService.getMpaById(mpaId).get();
+            Mpa mpa = mpaService.getMpaById(mpaId).get();
+            log.info("Mpa-рейтинг по идентификатору " + mpaId + " получен! Это " + mpa.getName());
+            return mpa;
         } catch (EmptyResultDataAccessException e) {
             throw new MpaNotFoundException("Рейтинг с указанным в запросе id не найден");
         }

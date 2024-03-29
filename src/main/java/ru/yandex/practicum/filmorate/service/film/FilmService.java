@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
+import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
+import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 
@@ -13,7 +16,8 @@ public interface FilmService {
 
     List<Film> getTopRatedFilms(Integer count);
 
-    public Film addFilm(Film film);
+
+    public Film addFilm(Film film) throws MpaNotFoundException, IncorrectMpaException, IncorrectGenreException;
 
     public Film updateFilm(Film film) throws FilmNotFoundException;
 

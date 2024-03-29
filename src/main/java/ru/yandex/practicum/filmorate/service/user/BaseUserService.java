@@ -16,8 +16,8 @@ public class BaseUserService implements UserService {
     @Autowired
     @Qualifier("userStorage")
     private UserStorage userStorage;
-    @Autowired
-    private FriendService friendService;
+//    @Autowired
+//    private FriendService friendService;
 
     @Override
     public void addFriend(Long userId1, Long userId2) throws UserNotFoundException {
@@ -25,7 +25,7 @@ public class BaseUserService implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         User friend = userStorage.getUserById(userId2)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-        friendService.addFriend(userId1, userId2);
+         userStorage.addFriend(userId1, userId2);
     }
 
     @Override
@@ -34,17 +34,20 @@ public class BaseUserService implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         User friend = userStorage.getUserById(userId2)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-        friendService.deleteFriend(userId1, userId2);
+        userStorage.deleteFriend(userId1, userId2);
     }
 
     @Override
-    public List<Long> getMutualFriends(Long userId1, Long userId2) {
-        return friendService.getMutualFriends(userId1, userId2);
+    public List<User> getMutualFriends(Long userId1, Long userId2) throws UserNotFoundException {
+        return userStorage.getMutualFriends(userId1, userId2);
     }
 
     @Override
-    public List<Long> getUsersFriends(Long userId) {
-        return friendService.getFriends(userId);
+    public List<User> getUsersFriends(Long userId) throws UserNotFoundException {
+        User user = userStorage.getUserById(userId)
+                .orElseThrow(() ->new UserNotFoundException("Пользователь не найден"));
+
+        return userStorage.getFriends(userId);
     }
 
     @Override

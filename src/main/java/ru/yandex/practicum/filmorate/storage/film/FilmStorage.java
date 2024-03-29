@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.film;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
+import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
+import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 
@@ -10,7 +13,7 @@ import java.util.Optional;
 @Component
 public interface FilmStorage {
 
-    public Film addFilm(Film film);
+    public Film addFilm(Film film) throws MpaNotFoundException, IncorrectMpaException, IncorrectGenreException;
 
     public Film deleteFilm(long filmId);
 
@@ -23,4 +26,5 @@ public interface FilmStorage {
     public List<Film> getTopRatedFilms(Integer count);
 
     public List<Film> getTopRatedFilms();
+
 }

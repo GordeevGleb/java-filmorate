@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 @Component
@@ -53,7 +55,32 @@ public class InMemoryUserStorage implements UserStorage {
        return Optional.of(users.get(userId));
     }
 
+    @Override
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return null;
+    }
+
     private long generateId() {
         return ++maxId;
+    }
+
+    @Override
+    public void addFriend(Long userId, Long friendId) throws UserNotFoundException {
+
+    }
+
+    @Override
+    public List<User> getFriends(Long userId) {
+        return null;
+    }
+
+    @Override
+    public void deleteFriend(Long userId, Long friendId) throws UserNotFoundException {
+
+    }
+
+    @Override
+    public List<User> getMutualFriends(Long userId1, Long userId2) {
+        return null;
     }
 }

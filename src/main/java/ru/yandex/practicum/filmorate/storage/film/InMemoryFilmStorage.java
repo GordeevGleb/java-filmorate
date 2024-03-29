@@ -71,6 +71,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return resultList.subList(0, 10);
     }
 
+
     private long generateId() {
         return ++maxId;
     }

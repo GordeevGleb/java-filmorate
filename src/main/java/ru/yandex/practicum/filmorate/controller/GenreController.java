@@ -25,13 +25,19 @@ public class GenreController {
 
     @GetMapping("/genres")
     public List<Genre> getAll() {
-        return genreService.getAllGenres();
+        log.info("Вывод всех жанров");
+        List<Genre> genres = genreService.getAllGenres();
+        log.info("Список всех жанров выведен");
+        return genres;
     }
 
     @GetMapping("/genres/{genreId}")
     public Genre getById(@PathVariable int genreId) throws GenreNotFoundException {
+        log.info("Поиск жанра по его идентификатору: " +genreId);
         try {
-            return genreService.getGenreById(genreId);
+            Genre genre = genreService.getGenreById(genreId);
+            log.info("Жанр по идентификатору " + genreId + " получен! Это " + genre.getName());
+            return genre;
         } catch (EmptyResultDataAccessException e) {
             throw new GenreNotFoundException("Жанр с указанным в запросе id не найден");
         }

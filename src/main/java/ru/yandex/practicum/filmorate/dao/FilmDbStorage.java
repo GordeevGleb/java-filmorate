@@ -2,11 +2,17 @@ package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
+import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
+import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
@@ -15,7 +21,9 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Component("filmStorage")
@@ -33,17 +41,57 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
         this.genreStorage = genreStorage;
     }
 
+//    @Override
+//    public Film addFilm(Film film) throws IncorrectMpaException, MpaNotFoundException, IncorrectGenreException {
+//        String sqlQuery = "insert into FILMS(FILM_TITLE, FILM_DESCRIPTION, FILM_RELEASE_DATE," +
+//                " FILM_DURATION, FILM_MPA_ID) values(?, ?, ?, ?, ?)";
+//        if (!mpaStorage.getAllMpa().contains(film.getMpa())) {
+//            throw new IncorrectMpaException("Рейтинг, указанный в фильме, не найден");
+//        }
+//        if (film.getGenres().size() > 0) {
+//            for (Genre genre : film.getGenres()) {
+//                if (!genreStorage.getAllGenres().contains(genre)) {
+//                    throw new IncorrectGenreException("Жанр фильма не найден");
+//                }
+//            }
+//        }
+//        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from FILMS where FILM_TITLE = ?",
+//                film.getName());
+//        if (filmRows.next()) {
+//            film.setId(filmRows.getLong("FILM_ID"));
+//            List<Genre> filmGenres = new ArrayList<>();
+//            film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()).get());
+//            for (Genre genre : film.getGenres()) {
+//                filmGenres.add(genre);
+//            }
+//            film.setGenres(filmGenres);
+//        }
+//        jdbcTemplate.update(sqlQuery,
+//                film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
+//                film.getMpa().getId());
+//        return film;
+//    }
     @Override
-    public Film addFilm(Film film) {
-        String sqlQuery = "insert into FILMS(FILM_TITLE, FILM_DESCRIPTION, FILM_RELEASE_DATE," +
-                " FILM_DURATION, FILM_MPA_ID) values(?, ?, ?, ?, ?)";
-            jdbcTemplate.update(sqlQuery,
-                    film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
-                    film.getMpa().getId());
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from FILMS where FILM_TITLE = ?",
-                film.getName());
-        if (filmRows.next()) {
-            film.setId(filmRows.getLong("FILM_ID"));
+    public Film addFilm(Film film) throws IncorrectMpaException, IncorrectGenreException {
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("FILMS")
+                .usingGeneratedKeyColumns("FILM_ID");
+        if (!mpaStorage.getAllMpa().contains(film.getMpa())) {
+            throw new IncorrectMpaException("Рейтинг, указанный в фильме, не найден");
+        }
+        if (film.getGenres().size() > 0) {
+            for (Genre genre : film.getGenres()) {
+                if (!genreStorage.getAllGenres().contains(genre)) {
+                    throw new IncorrectGenreException("Жанр фильма не найден");
+                }
+            }
+        }
+        film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue());
+        film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()).get());
+        for (Genre genre : film.getGenres()) {
+            String sqlQuery = "insert into FILM_GENRE(FILM_ID, GENRE_ID) values(?, ?)";
+            jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
+            genre.setName(genreStorage.getGenreById(genre.getId()).get().getName());
         }
         return film;
     }
@@ -72,8 +120,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
 
     @Override
     public List<Film> getAllFilms() {
-        String sqlQuery = "select FILM_ID, FILM_TITLE, FILM_DESCRIPTION, FILM_RELEASE_DATE, FILM_DURATION," +
-                "FILM_MPA_ID from FILMS inner join MPA on FILMS.FILM_MPA_ID = MPA.MPA_ID";
+        String sqlQuery = "select * from FILMS";
         return jdbcTemplate.query(sqlQuery, this::mapRow);
     }
 
@@ -86,35 +133,34 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
 
     @Override
     public List<Film> getTopRatedFilms(Integer count) {
-        String sqlQuery = "select * from FILMS inner join MPA on FILMS.FILM_MPA_ID = MPA.MPA_ID" +
-                " join LIKES on FILMS.FILM_ID = LIKES.FILM_ID group by LIKES.USER_ID, FILMS.FILM_ID" +
-                " order by count(LIKES.USER_ID) desc limit ?";
+        String sqlQuery = "select FILMS.* from FILMS inner join LIKES on FILMS.FILM_ID = LIKES.FILM_ID " +
+                "group by FILMS.FILM_ID order by count(LIKES.FILM_ID) desc limit ?";
         return   jdbcTemplate.query(sqlQuery, this::mapRow, count);
     }
 
+
     @Override
     public List<Film> getTopRatedFilms() {
-        String sqlQuery = "select * from FILMS inner join MPA on FILMS.FILM_MPA_ID = MPA.MPA_ID" +
-                " join LIKES on FILMS.FILM_ID = LIKES.FILM_ID group by LIKES.USER_ID, FILMS.FILM_ID" +
-                " order by count(LIKES.USER_ID) desc limit 10";
+        String sqlQuery = "select FILMS.* from FILMS inner join LIKES on FILMS.FILM_ID = LIKES.FILM_ID " +
+                "group by FILMS.FILM_ID order by count(LIKES.FILM_ID) desc limit 10";
       return   jdbcTemplate.query(sqlQuery, this::mapRow);
     }
 
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-    String genreQuery = "select GENRE_NAME from GENRES join FILM_GENRE on GENRES.GENRE_ID = FILM_GENRE.GENRE_ID" +
-            " join FILMS on FILM_GENRE.FILM_ID = FILMS.FILM_ID";
-    String likesQuery = "select USER_ID from LIKES join FILMS on LIKES.FILM_ID = FILMS.FILM_ID";
-    Film film = Film.builder()
-            .id(rs.getLong(1))
-            .name(rs.getString(2))
-            .description(rs.getString(3))
-            .releaseDate(rs.getDate(4).toLocalDate())
-            .duration(rs.getLong(5))
-            .mpa(mpaStorage.getMpaById(rs.getInt(6)).get())
-            .build();
-    film.setLikes(jdbcTemplate.queryForList(likesQuery, Long.class));
-    film.setGenres(jdbcTemplate.queryForList(genreQuery, Genre.class));
+        Film film = Film.builder()
+                .id(rs.getLong(1))
+                .name(rs.getString(2))
+                .description(rs.getString(3))
+                .releaseDate(rs.getDate(4).toLocalDate())
+                .duration(rs.getLong(5))
+                .mpa(mpaStorage.getMpaById(rs.getInt(6)).get())
+                .build();
+   List<Genre> genres = genreStorage.getGenresByFilmId(film.getId());
+        String likesQuery = "select USER_ID from LIKES join FILMS on LIKES.FILM_ID = FILMS.FILM_ID" +
+                " where FILMS.FILM_ID = ?";
+        film.setLikes(jdbcTemplate.queryForList(likesQuery, Long.class, film.getId()));
+        film.setGenres(genres);
         return film;
     }
 }
