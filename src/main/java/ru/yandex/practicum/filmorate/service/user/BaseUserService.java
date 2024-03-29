@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.FriendService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
@@ -16,8 +15,6 @@ public class BaseUserService implements UserService {
     @Autowired
     @Qualifier("userStorage")
     private UserStorage userStorage;
-//    @Autowired
-//    private FriendService friendService;
 
     @Override
     public void addFriend(Long userId1, Long userId2) throws UserNotFoundException {

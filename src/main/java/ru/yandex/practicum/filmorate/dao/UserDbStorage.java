@@ -5,7 +5,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,19 +25,6 @@ public class UserDbStorage implements UserStorage, RowMapper<User>, FriendServic
 
     private final JdbcTemplate jdbcTemplate;
 
-//    @Override
-//    public User addUser(User user) {
-//            String sqlQuery = "insert into USERS(USER_EMAIL, USER_LOGIN, USER_NAME, USER_BIRTHDAY)" +
-//                    " values(?, ?, ?, ?)";
-//            jdbcTemplate.update(sqlQuery,
-//                    user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
-//        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USERS where USER_LOGIN = ?",
-//                user.getLogin());
-//        if (userRows.next()) {
-//            user.setId(userRows.getLong("USER_ID"));
-//        }
-//            return user;
-//    }
 public User addUser(User user) {
     SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
             .withTableName("USERS")

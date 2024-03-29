@@ -2,17 +2,13 @@ package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
 import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
-import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
@@ -21,9 +17,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Component("filmStorage")
@@ -41,36 +35,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
         this.genreStorage = genreStorage;
     }
 
-//    @Override
-//    public Film addFilm(Film film) throws IncorrectMpaException, MpaNotFoundException, IncorrectGenreException {
-//        String sqlQuery = "insert into FILMS(FILM_TITLE, FILM_DESCRIPTION, FILM_RELEASE_DATE," +
-//                " FILM_DURATION, FILM_MPA_ID) values(?, ?, ?, ?, ?)";
-//        if (!mpaStorage.getAllMpa().contains(film.getMpa())) {
-//            throw new IncorrectMpaException("Рейтинг, указанный в фильме, не найден");
-//        }
-//        if (film.getGenres().size() > 0) {
-//            for (Genre genre : film.getGenres()) {
-//                if (!genreStorage.getAllGenres().contains(genre)) {
-//                    throw new IncorrectGenreException("Жанр фильма не найден");
-//                }
-//            }
-//        }
-//        SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from FILMS where FILM_TITLE = ?",
-//                film.getName());
-//        if (filmRows.next()) {
-//            film.setId(filmRows.getLong("FILM_ID"));
-//            List<Genre> filmGenres = new ArrayList<>();
-//            film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()).get());
-//            for (Genre genre : film.getGenres()) {
-//                filmGenres.add(genre);
-//            }
-//            film.setGenres(filmGenres);
-//        }
-//        jdbcTemplate.update(sqlQuery,
-//                film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
-//                film.getMpa().getId());
-//        return film;
-//    }
+
     @Override
     public Film addFilm(Film film) throws IncorrectMpaException, IncorrectGenreException {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
