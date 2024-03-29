@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
@@ -22,7 +23,7 @@ class UserDbStorageTest {
     private final JdbcTemplate jdbcTemplate;
 
     @Test
-    public void testFindUserById() throws UserNotFoundException {
+    public void testUserDbStorage() throws UserNotFoundException {
         User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
         UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
@@ -32,43 +33,31 @@ class UserDbStorageTest {
                 .isNotNull() //
                 .usingRecursiveComparison()
                 .isEqualTo(newUser);
-    }
 
-    @Test
-    public void testGetAllUsers() throws UserNotFoundException {
-        User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
+        User newUser1 = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
-        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
-        userDbStorage.addUser(newUser);
-        List<User> users = userDbStorage.getAllUsers();
+        userStorage.addUser(newUser1);
+        List<User> users = userStorage.getAllUsers();
 
         assertThat(users).isNotNull();
-        assertEquals(newUser, userDbStorage.getUserById(newUser.getId()).get());
-    }
+        assertEquals(newUser, userStorage.getUserById(newUser.getId()).get());
 
-    @Test
-    public void testUpdateUser() throws UserNotFoundException {
-        User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
+        User newUser2 = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
-        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
-        userDbStorage.addUser(newUser);
-        userDbStorage.updateUser(new User(1L, "123@yandex.com", "testLogin", "test Name",
+        userStorage.addUser(newUser2);
+        userStorage.updateUser(new User(1L, "123@yandex.com", "testLogin", "test Name",
                 LocalDate.of(1965, 1, 2)));
-        assertNotNull(userDbStorage.getUserById(newUser.getId()));
-        User savedUser = userDbStorage.getUserById(newUser.getId()).get();
-        assertEquals(savedUser.getName(), "test Name");
-    }
+        assertNotNull(userStorage.getUserById(newUser.getId()));
+        User savedUser1 = userStorage.getUserById(newUser.getId()).get();
+        assertEquals(savedUser1.getName(), "test Name");
 
-    @Test
-    public void testAddAndDeleteUser() throws UserNotFoundException {
-        User newUser = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
+        User newUser3 = new User(1L, "user@email.ru", "vanya123", "Ivan Petrov",
                 LocalDate.of(1990, 1, 1));
-        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
-        userDbStorage.addUser(newUser);
-        assertThat(userDbStorage).isNotNull();
-        assertEquals(userDbStorage.getUserById(1).get(), newUser);
+        userStorage.addUser(newUser3);
+        assertThat(userStorage).isNotNull();
+        assertEquals(userStorage.getUserById(1).get(), newUser);
 
-        userDbStorage.deleteUser(newUser.getId());
-        assertEquals(0, userDbStorage.getAllUsers().size());
+        userStorage.deleteUser(newUser.getId());
+        assertEquals(3, userStorage.getAllUsers().size());
     }
 }
