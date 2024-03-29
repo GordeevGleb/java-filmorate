@@ -70,8 +70,7 @@ public User addUser(User user) {
         String sqlQuery = "select USER_ID, USER_EMAIL, USER_LOGIN, USER_NAME, USER_BIRTHDAY" +
                 " from USERS where USER_ID = ?";
         return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRow, userId));
-    }
-    catch (EmptyResultDataAccessException e) {
+    } catch (EmptyResultDataAccessException e) {
         throw new UserNotFoundException("Пользователь не найден");
     }
     }
@@ -80,8 +79,7 @@ public User addUser(User user) {
     try {
         String sqlQuery = "insert into FRIENDSHIPS(USER_ID, FRIEND_ID) VALUES(?, ?)";
         jdbcTemplate.update(sqlQuery, userId, friendId);
-    }
-    catch (EmptyResultDataAccessException e) {
+    } catch (EmptyResultDataAccessException e) {
         throw new UserNotFoundException("Пользователь не найден");
     }
     }
@@ -94,8 +92,7 @@ public User addUser(User user) {
                 " left join USERS as U on U.USER_ID = fs.FRIEND_ID" +
                 " where fs.USER_ID = ?";
         return jdbcTemplate.query(test, this::mapRow, userId);
-    }
-    catch (EmptyResultDataAccessException e) {
+    } catch (EmptyResultDataAccessException e) {
         throw new UserNotFoundException("Пользователь не найден");
     }
     }
@@ -105,8 +102,7 @@ public User addUser(User user) {
     try {
         String sqlQuery = "delete from FRIENDSHIPS where USER_ID = ? AND FRIEND_ID = ?";
         jdbcTemplate.update(sqlQuery, userId, friendId);
-    }
-    catch (EmptyResultDataAccessException e) {
+    } catch (EmptyResultDataAccessException e) {
         throw new UserNotFoundException("Пользователь не найден");
     }
     }
@@ -119,8 +115,7 @@ public User addUser(User user) {
                 "and f1.USER_ID = ? and f2.USER_ID = ? " +
                 "inner join USERS as u on u.USER_ID = f2.FRIEND_ID";
         return jdbcTemplate.query(sqlQuery, this::mapRow, userId1, userId2);
-    }
-    catch (EmptyResultDataAccessException e) {
+    } catch (EmptyResultDataAccessException e) {
         throw new UserNotFoundException("Пользователь не найден");
     }
     }
