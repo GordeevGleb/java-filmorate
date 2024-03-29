@@ -23,7 +23,6 @@ public class FilmDbStorageTest {
 
     private final JdbcTemplate jdbcTemplate;
 
-
     @Test
     public void testCreateFilm() throws IncorrectMpaException, IncorrectGenreException {
           MpaDbStorage mpaDbStorage = new MpaDbStorage(jdbcTemplate);
@@ -43,6 +42,7 @@ assertThat(filmDbStorage).isNotNull();
 assertEquals(1, filmDbStorage.getAllFilms().size());
 assertEquals(film, filmDbStorage.getFilmById(film.getId()).get());
     }
+
 @Test
     public void testUpdateFilm() throws IncorrectMpaException, IncorrectGenreException {
         MpaDbStorage mpaDbStorage = new MpaDbStorage(jdbcTemplate);
