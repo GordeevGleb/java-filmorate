@@ -33,12 +33,8 @@ public class MpaController {
     @GetMapping("/mpa/{mpaId}")
     public Mpa getById(@PathVariable int mpaId) throws MpaNotFoundException {
         log.info("Поиск MPA-рейтинга по идентификатору " + mpaId);
-        try {
             Mpa mpa = mpaService.getMpaById(mpaId).get();
             log.info("Mpa-рейтинг по идентификатору " + mpaId + " получен! Это " + mpa.getName());
             return mpa;
-        } catch (EmptyResultDataAccessException e) {
-            throw new MpaNotFoundException("Рейтинг с указанным в запросе id не найден");
-        }
     }
 }

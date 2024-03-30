@@ -1,28 +1,29 @@
-package ru.yandex.practicum.filmorate.service.user;
+package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
 
 @Service
-public class BaseUserService implements UserService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     @Qualifier("userStorage")
     private UserStorage userStorage;
 
     @Override
-    public void addFriend(Long userId1, Long userId2) throws UserNotFoundException {
+    public boolean addFriend(Long userId1, Long userId2) throws UserNotFoundException {
         User user = userStorage.getUserById(userId1)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
         User friend = userStorage.getUserById(userId2)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
-         userStorage.addFriend(userId1, userId2);
+        return userStorage.addFriend(userId1, userId2);
     }
 
     @Override

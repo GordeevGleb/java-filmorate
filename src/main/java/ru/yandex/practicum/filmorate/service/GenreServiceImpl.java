@@ -1,20 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.dao.GenreStorage;
 
 import java.util.List;
 
 @Service
-public class BaseGenreService implements GenreService {
+public class GenreServiceImpl implements GenreService {
 
     private GenreStorage genreStorage;
 
     @Autowired
-    public BaseGenreService(GenreStorage genreStorage) {
+    public GenreServiceImpl(GenreStorage genreStorage) {
         this.genreStorage = genreStorage;
     }
 
@@ -40,8 +41,13 @@ public class BaseGenreService implements GenreService {
 
     @Override
     public Genre getGenreById(int genreId) throws GenreNotFoundException {
-        Genre genre = genreStorage.getGenreById(genreId)
-                .orElseThrow(() -> new GenreNotFoundException("Жанр с id " + genreId + " не найден"));
-        return genre;
+        try {
+            Genre genre = genreStorage.getGenreById(genreId)
+                    .orElseThrow(() -> new GenreNotFoundException("Жанр с id " + genreId + " не найден"));
+            return genre;
+        } catch (
+    EmptyResultDataAccessException e) {
+        throw new GenreNotFoundException("Жанр с указанным в запросе id не найден");
+    }
     }
 }

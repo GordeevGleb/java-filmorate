@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -63,12 +63,13 @@ public class UserController {
 
     @PutMapping("/users/{userId}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
-    public void addFriend(@PathVariable Long userId,
+    public boolean addFriend(@PathVariable Long userId,
                                 @PathVariable Long friendId) throws UserNotFoundException {
         log.info("Пользователь " + userId + " добавляет в друзья " + friendId);
         User friend = userService.getUserById(friendId);
-        userService.addFriend(userId, friendId);
-        log.info("Добавление в друзья произошло успешно");
+        Boolean isConFirmedFriend = userService.addFriend(userId, friendId);
+        log.info("Добавление в друзья прошло успешно; статус совместной дружбы: " + isConFirmedFriend);
+        return isConFirmedFriend;
     }
 
     @DeleteMapping("/users/{userId}/friends/{friendId}")

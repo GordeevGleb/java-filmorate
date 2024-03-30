@@ -11,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FriendService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,7 +20,7 @@ import java.util.Optional;
 @Component("userStorage")
 @RequiredArgsConstructor
 @Repository
-public class UserDbStorage implements UserStorage, RowMapper<User>, FriendService {
+public class UserDbStorage implements UserStorage, RowMapper<User> {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -76,10 +75,13 @@ public class UserDbStorage implements UserStorage, RowMapper<User>, FriendServic
     }
 
     @Override
-    public void addFriend(Long userId, Long friendId) throws UserNotFoundException {
+    public boolean addFriend(Long userId, Long friendId) throws UserNotFoundException {
         try {
             String sqlQuery = "insert into FRIENDSHIPS(USER_ID, FRIEND_ID) VALUES(?, ?)";
             jdbcTemplate.update(sqlQuery, userId, friendId);
+            String sqlQuery1 = "select (exists(select * from FRIENDSHIPS where USER_ID = ? and FRIEND_ID = ?))";
+                   Boolean isConfirmedFriend = jdbcTemplate.queryForObject(sqlQuery1, Boolean.class, friendId, userId);
+           return isConfirmedFriend;
         } catch (EmptyResultDataAccessException e) {
             throw new UserNotFoundException("Пользователь не найден");
         }

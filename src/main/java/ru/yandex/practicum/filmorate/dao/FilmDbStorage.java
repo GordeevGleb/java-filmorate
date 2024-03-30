@@ -11,12 +11,10 @@ import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
 import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,8 +42,9 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
         if (!mpaStorage.getAllMpa().contains(film.getMpa())) {
             throw new IncorrectMpaException("Рейтинг, указанный в фильме, не найден");
         }
+        List<Genre> filmGenres = film.getGenres();
         if (film.getGenres().size() > 0) {
-            for (Genre genre : film.getGenres()) {
+            for (Genre genre : filmGenres) {
                 if (!genreStorage.getAllGenres().contains(genre)) {
                     throw new IncorrectGenreException("Жанр фильма не найден");
                 }
@@ -53,7 +52,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
         }
         film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue());
         film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()).get());
-        for (Genre genre : film.getGenres()) {
+        for (Genre genre : filmGenres) {
             String sqlQuery = "insert into FILM_GENRE(FILM_ID, GENRE_ID) values(?, ?)";
             jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
             genre.setName(genreStorage.getGenreById(genre.getId()).get().getName());

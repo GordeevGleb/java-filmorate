@@ -5,12 +5,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BaseLikeService implements LikeService {
+public class LikeServiceImpl implements LikeService {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public BaseLikeService(JdbcTemplate jdbcTemplate) {
+    public LikeServiceImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FriendService {
 
-    void addFriend(Long userId, Long friendId) throws UserNotFoundException;
+    boolean addFriend(Long userId, Long friendId) throws UserNotFoundException;
 
     List<User> getFriends(Long userId) throws UserNotFoundException;
 
