@@ -42,9 +42,10 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
             throw new IncorrectMpaException("Рейтинг, указанный в фильме, не найден");
         }
         List<Genre> filmGenres = film.getGenres();
-        if (film.getGenres().size() > 0) {
+        List<Genre> allGenres = genreStorage.getAllGenres();
+        if (filmGenres.size() > 0) {
             for (Genre genre : filmGenres) {
-                if (!genreStorage.getAllGenres().contains(genre)) {
+                if (!allGenres.contains(genre)) {
                     throw new IncorrectGenreException("Жанр фильма не найден");
                 }
             }
