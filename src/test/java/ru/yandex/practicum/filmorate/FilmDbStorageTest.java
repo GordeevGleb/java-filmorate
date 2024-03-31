@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.dao.GenreDbStorage;
 import ru.yandex.practicum.filmorate.dao.MpaDbStorage;
 import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
 import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
+import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class FilmDbStorageTest {
     private final JdbcTemplate jdbcTemplate;
 
     @Test
-    public void testCreateFilm() throws IncorrectMpaException, IncorrectGenreException {
+    public void testCreateFilm() throws IncorrectMpaException, IncorrectGenreException, MpaNotFoundException {
           MpaDbStorage mpaDbStorage = new MpaDbStorage(jdbcTemplate);
           GenreDbStorage genreDbStorage = new GenreDbStorage(jdbcTemplate);
         FilmDbStorage filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaDbStorage, genreDbStorage);
@@ -44,7 +45,7 @@ assertEquals(film, filmDbStorage.getFilmById(film.getId()).get());
     }
 
 @Test
-    public void testUpdateFilm() throws IncorrectMpaException, IncorrectGenreException {
+    public void testUpdateFilm() throws IncorrectMpaException, IncorrectGenreException, MpaNotFoundException {
         MpaDbStorage mpaDbStorage = new MpaDbStorage(jdbcTemplate);
         GenreDbStorage genreDbStorage = new GenreDbStorage(jdbcTemplate);
         FilmDbStorage filmDbStorage = new FilmDbStorage(jdbcTemplate, mpaDbStorage, genreDbStorage);

@@ -16,42 +16,42 @@ import java.util.Optional;
 public class MpaDbStorage implements MpaStorage, RowMapper<Mpa> {
     private final JdbcTemplate jdbcTemplate;
 
-@Autowired
+    @Autowired
     public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public Mpa addMpa(Mpa mpa) {
-    String sqlQuery = "insert into MPA(MPA_NAME) values(?)";
-    jdbcTemplate.update(sqlQuery, mpa.getName());
+        String sqlQuery = "insert into MPA(MPA_NAME) values(?)";
+        jdbcTemplate.update(sqlQuery, mpa.getName());
         return mpa;
     }
 
     @Override
     public Mpa updateMpa(Mpa mpa) {
-    String sqlQuery = "update MPA set MPA_NAME = ? where MPA_ID = ?";
-    jdbcTemplate.update(sqlQuery, mpa.getName(), mpa.getId());
+        String sqlQuery = "update MPA set MPA_NAME = ? where MPA_ID = ?";
+        jdbcTemplate.update(sqlQuery, mpa.getName(), mpa.getId());
         return mpa;
     }
 
     @Override
     public List<Mpa> getAllMpa() {
-    String sqlQuery = "select MPA_ID, MPA_NAME from MPA";
+        String sqlQuery = "select MPA_ID, MPA_NAME from MPA";
         return jdbcTemplate.query(sqlQuery, this::mapRow);
     }
 
     @Override
     public Mpa deleteMpa(int mpaId) {
-    String sqlQuery = "delete from MPA where MPA_ID = ?";
-    jdbcTemplate.update(sqlQuery, mpaId);
+        String sqlQuery = "delete from MPA where MPA_ID = ?";
+        jdbcTemplate.update(sqlQuery, mpaId);
         return null;
     }
 
     @Override
     public Optional<Mpa> getMpaById(int mpaId) {
-    String sqlQuery = "select MPA_ID, MPA_NAME from MPA where MPA_ID = ?";
-        return Optional.ofNullable(jdbcTemplate.queryForObject(sqlQuery, this::mapRow, mpaId));
+        String sqlQuery = "select MPA_ID, MPA_NAME from MPA where MPA_ID = ?";
+        return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapRow, mpaId));
     }
 
     @Override
@@ -61,4 +61,5 @@ public class MpaDbStorage implements MpaStorage, RowMapper<Mpa> {
                 .name(rs.getString(2))
                 .build();
     }
+
 }

@@ -79,8 +79,8 @@ public class UserDbStorage implements UserStorage, RowMapper<User> {
             String sqlQuery = "insert into FRIENDSHIPS(USER_ID, FRIEND_ID) VALUES(?, ?)";
             jdbcTemplate.update(sqlQuery, userId, friendId);
             String sqlQuery1 = "select (exists(select * from FRIENDSHIPS where USER_ID = ? and FRIEND_ID = ?))";
-                   Boolean isConfirmedFriend = jdbcTemplate.queryForObject(sqlQuery1, Boolean.class, friendId, userId);
-           return isConfirmedFriend;
+            Boolean isConfirmedFriend = jdbcTemplate.queryForObject(sqlQuery1, Boolean.class, friendId, userId);
+            return isConfirmedFriend;
         } catch (EmptyResultDataAccessException e) {
             throw new UserNotFoundException("Пользователь не найден");
         }

@@ -16,7 +16,7 @@ import java.util.Optional;
 public class GenreDbStorage implements GenreStorage, RowMapper<Genre> {
     private final JdbcTemplate jdbcTemplate;
 
-@Autowired
+    @Autowired
     public GenreDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }

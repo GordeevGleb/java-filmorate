@@ -84,7 +84,7 @@ public class FilmController {
         log.info("Получен запрос на составление списка " + count + " самых оцениваемых фильмов");
         List<Film> topRatedFims = filmService.getTopRatedFilms(count);
         log.info("Список фильмов с наибольшим количеством оценок получен");
-       return topRatedFims;
+        return topRatedFims;
     }
 
 }

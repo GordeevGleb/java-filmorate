@@ -64,7 +64,7 @@ public class UserController {
     @PutMapping("/users/{userId}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     public boolean addFriend(@PathVariable Long userId,
-                                @PathVariable Long friendId) throws UserNotFoundException {
+                             @PathVariable Long friendId) throws UserNotFoundException {
         log.info("Пользователь " + userId + " добавляет в друзья " + friendId);
         User friend = userService.getUserById(friendId);
         Boolean isConFirmedFriend = userService.addFriend(userId, friendId);
@@ -75,7 +75,7 @@ public class UserController {
     @DeleteMapping("/users/{userId}/friends/{friendId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteFriend(@PathVariable Long userId,
-                                   @PathVariable Long friendId) throws UserNotFoundException {
+                             @PathVariable Long friendId) throws UserNotFoundException {
         log.info("Запрос на удаление друга " + friendId + " пользователем " + userId);
         userService.deleteFriend(userId, friendId);
         log.info("Пользователь " + friendId + " удален из списка друзей " + userId);

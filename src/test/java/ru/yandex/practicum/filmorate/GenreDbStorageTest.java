@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.dao.GenreDbStorage;
+import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class GenreDbStorageTest {
     private final JdbcTemplate jdbcTemplate;
 
     @Test
-    public void testGenreDb() {
+    public void testGenreDb() throws GenreNotFoundException {
         GenreDbStorage genreDbStorage = new GenreDbStorage(jdbcTemplate);
         List<Genre> allGenres = genreDbStorage.getAllGenres();
         assertThat(allGenres).isNotNull();

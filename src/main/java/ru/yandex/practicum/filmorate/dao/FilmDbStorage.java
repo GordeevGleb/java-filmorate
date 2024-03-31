@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
 import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +26,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
     private final MpaStorage mpaStorage;
     private final GenreStorage genreStorage;
 
-@Autowired
+    @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaStorage mpaStorage, GenreStorage genreStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.mpaStorage = mpaStorage;
@@ -34,12 +35,15 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
 
 
     @Override
-    public Film addFilm(Film film) throws IncorrectMpaException, IncorrectGenreException {
+        public Film addFilm(Film film) throws IncorrectMpaException, IncorrectGenreException {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("FILMS")
                 .usingGeneratedKeyColumns("FILM_ID");
         if (!mpaStorage.getAllMpa().contains(film.getMpa())) {
             throw new IncorrectMpaException("Рейтинг, указанный в фильме, не найден");
+        } else {
+           int filmMpaId = film.getMpa().getId();
+           film.getMpa().setName(mpaStorage.getMpaById(filmMpaId).get().getName());
         }
         List<Genre> filmGenres = film.getGenres();
         List<Genre> allGenres = genreStorage.getAllGenres();
@@ -51,11 +55,10 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
             }
         }
         film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue());
-        film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()).get());
         for (Genre genre : filmGenres) {
             String sqlQuery = "insert into FILM_GENRE(FILM_ID, GENRE_ID) values(?, ?)";
             jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
-            genre.setName(genreStorage.getGenreById(genre.getId()).get().getName());
+            genre.setName(allGenres.get(genre.getId()).getName());
         }
         return film;
     }
@@ -73,7 +76,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
                 "FILM_DURATION = ?, FILM_MPA_ID = ? where FILM_ID = ?";
         int updateCount = jdbcTemplate.update(sqlQuery,
                 film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
-        film.getMpa().getId(), film.getId());
+                film.getMpa().getId(), film.getId());
         if (updateCount != 0) {
             film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()).get());
             return Optional.of(film);
@@ -107,7 +110,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
     public List<Film> getTopRatedFilms() {
         String sqlQuery = "select FILMS.* from FILMS inner join LIKES on FILMS.FILM_ID = LIKES.FILM_ID " +
                 "group by FILMS.FILM_ID order by count(LIKES.FILM_ID) desc limit 10";
-      return   jdbcTemplate.query(sqlQuery, this::mapRow);
+        return   jdbcTemplate.query(sqlQuery, this::mapRow);
     }
 
     @Override
@@ -120,7 +123,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
                 .duration(rs.getLong(5))
                 .mpa(mpaStorage.getMpaById(rs.getInt(6)).get())
                 .build();
-   List<Genre> genres = genreStorage.getGenresByFilmId(film.getId());
+        List<Genre> genres = genreStorage.getGenresByFilmId(film.getId());
         String likesQuery = "select USER_ID from LIKES join FILMS on LIKES.FILM_ID = FILMS.FILM_ID" +
                 " where FILMS.FILM_ID = ?";
         film.setLikes(jdbcTemplate.queryForList(likesQuery, Long.class, film.getId()));
