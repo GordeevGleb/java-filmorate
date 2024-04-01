@@ -1,17 +1,15 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
 import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,31 +33,30 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
 
 
     @Override
-        public Film addFilm(Film film) throws IncorrectMpaException, IncorrectGenreException {
+    public Film addFilm(Film film) throws IncorrectMpaException, IncorrectGenreException {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("FILMS")
                 .usingGeneratedKeyColumns("FILM_ID");
         if (!mpaStorage.getAllMpa().contains(film.getMpa())) {
             throw new IncorrectMpaException("Рейтинг, указанный в фильме, не найден");
         } else {
-           int filmMpaId = film.getMpa().getId();
-           film.getMpa().setName(mpaStorage.getMpaById(filmMpaId).get().getName());
+            int filmMpaId = film.getMpa().getId();
+            film.getMpa().setName(mpaStorage.getMpaById(filmMpaId).get().getName());
         }
-        List<Genre> filmGenres = film.getGenres();
+        long filmId = simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue();
+        film.setId(filmId);
+       List<Genre> filmGenres = film.getGenres();
         List<Genre> allGenres = genreStorage.getAllGenres();
         if (filmGenres.size() > 0) {
             for (Genre genre : filmGenres) {
                 if (!allGenres.contains(genre)) {
                     throw new IncorrectGenreException("Жанр фильма не найден");
                 }
+                String sqlQuery = "insert into FILM_GENRE(FILM_ID, GENRE_ID) values(?, ?)";
+                jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
             }
         }
-        film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue());
-        for (Genre genre : filmGenres) {
-            String sqlQuery = "insert into FILM_GENRE(FILM_ID, GENRE_ID) values(?, ?)";
-            jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
-            genre.setName(allGenres.get(genre.getId()).getName());
-        }
+        film.setGenres(genreStorage.getGenresByFilmId(filmId));
         return film;
     }
 
@@ -81,7 +78,7 @@ public class FilmDbStorage implements FilmStorage, RowMapper<Film> {
             film.setMpa(mpaStorage.getMpaById(film.getMpa().getId()).get());
             return Optional.of(film);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
+            throw new FilmNotFoundException("Фильм не найден");
         }
     }
 
