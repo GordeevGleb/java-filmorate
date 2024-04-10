@@ -149,7 +149,8 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopular(int count) {
+    public List<Film> getPopular(int count, Integer genreId, Integer year) {
+        var where = getWhere(genreId, year);
         String sqlReadFilmQuery = "SELECT f.id,\n" +
                 "    f.name AS film_name,\n" +
                 "    f.description,\n" +
@@ -160,6 +161,7 @@ public class DbFilmStorage implements FilmStorage {
                 "FROM film AS f\n" +
                 "LEFT JOIN rating AS r ON f.rating_id = r.id\n" +
                 "LEFT JOIN film_likes AS l ON f.id = l.film_id\n" +
+                where +
                 "GROUP BY f.id\n" +
                 "ORDER BY COUNT(l.film_id) DESC\n" +
                 "LIMIT :count;";
@@ -344,6 +346,19 @@ public class DbFilmStorage implements FilmStorage {
                 .addValue("directorQuery", "%" + directorQuery + "%");
 
         return jdbcTemplate.query(sqlQuery, namedParameters, this::makeAllFilms);
+    }
+
+    private static String getWhere(Integer genreId, Integer year) {
+        if (genreId == null && year == null) return "";
+        var dateQuery = String.format("f.release_date BETWEEN '%1$d-01-01' AND '%1$d-12-31'", year);
+        var genreQuery = String.format("f.id IN (SELECT film_id FROM film_genre WHERE genre_id = %d)", genreId);
+        if (genreId != null && year != null) {
+            return "WHERE (" + dateQuery + ") AND (" + genreQuery + ")\n";
+        }
+        if (genreId != null) {
+            return "WHERE " + genreQuery + "\n";
+        }
+        return "WHERE " + dateQuery + "\n";
     }
 
     private static String getDirectorIdQuery(String sortBy) {

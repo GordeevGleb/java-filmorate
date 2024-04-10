@@ -49,9 +49,9 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public Film getById(@PathVariable Long id) {
-        log.info("GET /film: {}", id);
+        log.info("GET /films/{}", id);
         var resultFilm = filmService.getFilm(id);
-        log.info("completion GET /films: {}", resultFilm);
+        log.info("completion GET /films/{}: {}", id, resultFilm);
         return resultFilm;
     }
 
@@ -79,9 +79,11 @@ public class FilmController {
 
     @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
-    public List<Film> getPopular(@RequestParam(defaultValue = "10") @Min(1) int count) {
-        log.info("GET /popular: {}", count);
-        var resultFilms = filmService.getPopular(count);
+    public List<Film> getPopular(@RequestParam(defaultValue = "10") @Min(1) int count,
+                                 @RequestParam(required = false) @Min(1) Integer genreId,
+                                 @RequestParam(required = false) @Min(1895) Integer year) {
+        log.info("GET /popular: {} {} {}", count, genreId, year);
+        var resultFilms = filmService.getPopular(count, genreId, year);
         log.info("completion GET /popular: size {}", resultFilms.size());
         return resultFilms;
     }
@@ -90,7 +92,7 @@ public class FilmController {
     public List<Film> getByDirectorId(@PathVariable Long directorId, @RequestParam @SortingConstraint String sortBy) {
         log.info("GET /director/{directorId}?sortBy: {}, {}", directorId, sortBy);
         var films = filmService.getByDirectorId(directorId, sortBy);
-        log.info("completion PUT /like: success");
+        log.info("completion GET /director/{directorId}?sortBy: {}, {} success", directorId, sortBy);
         return films;
     }
 
