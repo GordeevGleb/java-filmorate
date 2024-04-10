@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Setter;
-import ru.yandex.practicum.filmorate.util.ReleaseDateConstraint;
+import ru.yandex.practicum.filmorate.utils.ReleaseDateConstraint;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
