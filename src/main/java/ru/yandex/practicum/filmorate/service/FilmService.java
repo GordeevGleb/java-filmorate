@@ -1,29 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
-import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
-import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-
 
 import java.util.List;
 
 public interface FilmService {
-    void addLike(Long filmId, Long userId);
+    Film addFilm(Film film);
 
-    void deleteLike(Long filmId, Long userId);
+    Film changeFilm(Film film);
 
-    List<Film> getTopRatedFilms(Integer count);
+    List<Film> getFilms();
 
+    Film getFilm(Long id);
 
-    public Film addFilm(Film film) throws MpaNotFoundException, IncorrectMpaException, IncorrectGenreException;
+    void putLike(Long id, Long userId);
 
-    public Film updateFilm(Film film) throws FilmNotFoundException;
+    void deleteLike(Long id, Long userId);
 
-    public List<Film> getAllFilms();
-
-    public Film deleteFilm(long filmId);
-
-    public Film getFilmById(long filmId) throws FilmNotFoundException;
+    List<Film> getPopular(int count);
 }

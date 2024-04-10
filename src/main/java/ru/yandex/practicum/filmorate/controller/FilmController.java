@@ -1,91 +1,81 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import ru.yandex.practicum.filmorate.exception.*;
-
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import javax.validation.Valid;
-import java.util.*;
 
-@RestController
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import java.util.List;
+
 @Slf4j
+@Validated
+@RestController
+@RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
+
     private final FilmService filmService;
 
-    @Autowired
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Film add(@Valid @RequestBody Film film) {
+        log.info("POST /films: {}", film.toString());
+        var resultFilm = filmService.addFilm(film);
+        log.info("completion POST /films: {}", resultFilm);
+        return resultFilm;
     }
 
-    @PostMapping("/films")
-    public Film addFilm(@Valid @RequestBody Film film)
-            throws MpaNotFoundException, IncorrectMpaException, IncorrectGenreException {
-        log.info("Добавляю фильм " + film.getName());
-        filmService.addFilm(film);
-        log.info("Фильм " + film.getName() + " добавлен; его id: " + film.getId());
-        return film;
+    @PutMapping
+    public Film change(@Valid @RequestBody Film film) {
+        log.info("PUT /films: {}", film.toString());
+        var resultFilm = filmService.changeFilm(film);
+        log.info("completion PUT /films: {}", resultFilm);
+        return resultFilm;
     }
 
-    @PutMapping("/films")
-    public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFoundException {
-        log.info("Обновляю информацию о фильме " + film.getName());
-        filmService.updateFilm(film);
-        log.info("Информация о фильме обновлена");
-        return film;
+    @GetMapping
+    public List<Film> getAll() {
+        log.info("GET /films: all");
+        var resultFilms =  filmService.getFilms();
+        log.info("completion GET /films: size {}", resultFilms.size());
+        return resultFilms;
     }
 
-    @GetMapping("/films")
-    public List<Film> getAllFilms() {
-        log.info("Вывожу список всех фильмов");
-        List<Film> allFilms = filmService.getAllFilms();
-        log.info("Список всех фильмов выведен");
-        return allFilms;
+    @GetMapping("/{id}")
+    public Film getById(@PathVariable Long id) {
+        log.info("GET /film: {}", id);
+        var resultFilm = filmService.getFilm(id);
+        log.info("completion GET /films: {}", resultFilm);
+        return resultFilm;
     }
 
-    @DeleteMapping("/films")
+    @PutMapping("/{id}/like/{userId}")
+    public void putLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("PUT /like: {}, {}", id, userId);
+        filmService.putLike(id, userId);
+        log.info("completion PUT /like: success");
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("DELETE /like: {}, {}", id, userId);
+        filmService.deleteLike(id, userId);
+        log.info("completion DELETE /like: success");
+    }
+
+    @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteFilm(long filmId) {
-        log.info("Удаляю фильм с идентификатором " + filmId);
-        filmService.deleteFilm(filmId);
-        log.info("Фильм с id " + filmId + " удалён");
+    public List<Film> getPopular(@RequestParam(defaultValue = "10") @Min(1) int count) {
+        log.info("GET /popular: {}", count);
+        var resultFilms = filmService.getPopular(count);
+        log.info("completion GET /popular: size {}", resultFilms.size());
+        return resultFilms;
     }
-
-    @GetMapping("/films/{filmId}")
-    public Film getFilmById(@PathVariable long filmId) throws FilmNotFoundException {
-        log.info("Получаю фильм по идентификатору " + filmId);
-        Film film = filmService.getFilmById(filmId);
-        log.info("Фильм с указанным идентификатором получен");
-        return film;
-    }
-
-    @PutMapping("/films/{filmId}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void setLike(@PathVariable Long filmId, @PathVariable Long userId) {
-        filmService.addLike(filmId, userId);
-        log.info("Пользователь " + userId + " поставил отметку like фильму " + filmId);
-    }
-
-    @DeleteMapping("/films/{filmId}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteLike(@PathVariable Long filmId, @PathVariable Long userId) throws FilmNotFoundException,
-            UserNotFoundException {
-        Film film = filmService.getFilmById(filmId);
-        filmService.deleteLike(filmId, userId);
-        log.info("Пользователь " + userId + " убрал отметку like с фильма " + filmId);
-    }
-
-    @GetMapping("/films/popular")
-    public List<Film> getTopRatedFilms(@RequestParam(required = false) Integer count) {
-        log.info("Получен запрос на составление списка " + count + " самых оцениваемых фильмов");
-        List<Film> topRatedFims = filmService.getTopRatedFilms(count);
-        log.info("Список фильмов с наибольшим количеством оценок получен");
-        return topRatedFims;
-    }
-
 }
 

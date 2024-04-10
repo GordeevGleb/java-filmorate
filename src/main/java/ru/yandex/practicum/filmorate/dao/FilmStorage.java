@@ -1,30 +1,22 @@
 package ru.yandex.practicum.filmorate.dao;
-import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.IncorrectGenreException;
-import ru.yandex.practicum.filmorate.exception.IncorrectMpaException;
-import ru.yandex.practicum.filmorate.exception.MpaNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-
 
 import java.util.List;
 import java.util.Optional;
 
-@Component
 public interface FilmStorage {
 
-    public Film addFilm(Film film) throws MpaNotFoundException, IncorrectMpaException, IncorrectGenreException;
+    Film create(Film film);
 
-    public Film deleteFilm(long filmId);
+    Optional<Film> update(Film film);
 
-    public Optional<Film> updateFilm(Film film) throws FilmNotFoundException;
+    List<Film> findAll();
 
-    public List<Film> getAllFilms();
+    Optional<Film> findById(Long id);
 
-    public Optional<Film> getFilmById(long filmId) throws FilmNotFoundException;
+    void putLike(Long id, Long userId);
 
-    public List<Film> getTopRatedFilms(Integer count);
+    void deleteLike(Long id, Long userId);
 
-    public List<Film> getTopRatedFilms();
-
+    List<Film> getPopular(int count);
 }

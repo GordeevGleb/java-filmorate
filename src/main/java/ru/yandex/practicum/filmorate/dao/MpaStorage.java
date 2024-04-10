@@ -7,13 +7,7 @@ import java.util.Optional;
 
 public interface MpaStorage {
 
-    public Mpa addMpa(Mpa mpa);
+    List<Mpa> findAll();
 
-    public Mpa updateMpa(Mpa mpa);
-
-    public List<Mpa> getAllMpa();
-
-    public Mpa deleteMpa(int mpaId);
-
-    public Optional<Mpa> getMpaById(int mpaId);
+    Optional<Mpa> findById(Integer id);
 }
