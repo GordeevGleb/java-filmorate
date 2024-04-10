@@ -59,4 +59,10 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> getPopular(int count) {
         return filmStorage.getPopular(count);
     }
+
+    @Override
+    public List<Film> getRecommendation(Long id) {
+        Long userWithSimilarLikes = userStorage.findUserWithSimilarLikes(id);
+        return filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
+    }
 }

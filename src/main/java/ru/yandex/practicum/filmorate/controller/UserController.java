@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -17,6 +19,8 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+    private final FilmService filmService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -80,5 +84,12 @@ public class UserController {
         var result = userService.getCommonFriends(id, secondId);
         log.info("completion GET /friends/common: size {}", result.size());
         return result;
+    }
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable Long id) {
+        log.info("GET / recommendations: {}", id);
+        List<Film> resultList = filmService.getRecommendation(id);
+        log.info("completion GET /recommendations: size {}", resultList.size());
+        return resultList;
     }
 }
