@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
-import ru.yandex.practicum.filmorate.dao.impl.DbMpaStorage;
+import ru.yandex.practicum.filmorate.storage.impl.DbMpaStorage;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.Map;
