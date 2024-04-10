@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.impl;
+package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,10 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.impl.DbFilmStorage;
+import ru.yandex.practicum.filmorate.storage.impl.DbUserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -20,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class DbFilmStorageTest {
 
     private final NamedParameterJdbcOperations jdbcTemplate;
@@ -28,6 +32,7 @@ class DbFilmStorageTest {
     private Film filmWithoutGenre;
     private Film filmWithoutMpa;
     private Film filmWithoutAll;
+    private Film filmWithAll;
     private DbFilmStorage dbFilmStorage;
     private DbUserStorage dbUserStorage;
 
@@ -74,6 +79,12 @@ class DbFilmStorageTest {
                 LocalDate.of(2005, 10, 11),
                 40, null,
                 new LinkedHashSet<>(),
+                new LinkedHashSet<>()
+        );
+        filmWithAll = new Film(1, "all name", "all description",
+                LocalDate.of(2000, 10, 5),
+                10, ratings.get(2),
+                new LinkedHashSet<>(Set.of(genres.get(2), genres.get(5))),
                 new LinkedHashSet<>()
         );
         user = new User(10, "user@mail.com", "user_login", "user_name",
@@ -202,25 +213,7 @@ class DbFilmStorageTest {
 
     @Test
     public void getPopularWithLikes() {
-        List<Long> filmsId = new ArrayList<>();
-        filmsId.add(dbFilmStorage.create(film).getId());
-        filmsId.add(dbFilmStorage.create(filmWithoutMpa).getId());
-        filmsId.add(dbFilmStorage.create(filmWithoutGenre).getId());
-        filmsId.add(dbFilmStorage.create(filmWithoutAll).getId());
-
-        List<Long> usersId = new ArrayList<>();
-        usersId.add(dbUserStorage.create(user).getId());
-        usersId.add(dbUserStorage.create(user).getId());
-        usersId.add(dbUserStorage.create(user).getId());
-
-        dbFilmStorage.putLike(filmsId.get(2), usersId.get(0));
-        dbFilmStorage.putLike(filmsId.get(2), usersId.get(1));
-        dbFilmStorage.putLike(filmsId.get(2), usersId.get(2));
-
-        dbFilmStorage.putLike(filmsId.get(0), usersId.get(0));
-        dbFilmStorage.putLike(filmsId.get(0), usersId.get(1));
-
-        dbFilmStorage.putLike(filmsId.get(3), usersId.get(0));
+        var filmsId = initDb();
 
         assertThat(dbFilmStorage.getPopular(2))
                 .isNotNull()
@@ -231,15 +224,79 @@ class DbFilmStorageTest {
                 .hasSize(filmsId.size());
         assertThat(films.get(0).getId())
                 .isNotNull()
-                .isEqualTo(filmsId.get(2));
+                .isEqualTo(filmsId.get(4));
         assertThat(films.get(1).getId())
                 .isNotNull()
-                .isEqualTo(filmsId.get(0));
+                .isEqualTo(filmsId.get(2));
         assertThat(films.get(2).getId())
                 .isNotNull()
-                .isEqualTo(filmsId.get(3));
+                .isEqualTo(filmsId.get(0));
         assertThat(films.get(3).getId())
                 .isNotNull()
+                .isEqualTo(filmsId.get(3));
+        assertThat(films.get(4).getId())
+                .isNotNull()
                 .isEqualTo(filmsId.get(1));
+    }
+
+    @Test
+    public void getCommonEmpty() {
+        assertThat(dbFilmStorage.getCommon(1, 2))
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    public void getCommonNotEmpty() {
+        var filmsId = initDb();
+
+        var films = dbFilmStorage.getCommon(1, 2);
+        assertThat(films)
+                .isNotNull()
+                .hasSize(3);
+        assertThat(films.get(0).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(4));
+        assertThat(films.get(1).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(2));
+        assertThat(films.get(2).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(0));
+    }
+
+    private List<Long> initDb() {
+        List<Long> filmsId = new ArrayList<>();
+        filmsId.add(dbFilmStorage.create(film).getId());
+        filmsId.add(dbFilmStorage.create(filmWithoutMpa).getId());
+        filmsId.add(dbFilmStorage.create(filmWithoutGenre).getId());
+        filmsId.add(dbFilmStorage.create(filmWithoutAll).getId());
+        filmsId.add(dbFilmStorage.create(filmWithAll).getId());
+
+        List<Long> usersId = new ArrayList<>();
+        usersId.add(dbUserStorage.create(user).getId());
+        usersId.add(dbUserStorage.create(user).getId());
+        usersId.add(dbUserStorage.create(user).getId());
+        usersId.add(dbUserStorage.create(user).getId());
+
+        // most popular filmWithoutGenre id == 5, likes amount == 4
+        dbFilmStorage.putLike(filmsId.get(4), usersId.get(0));
+        dbFilmStorage.putLike(filmsId.get(4), usersId.get(1));
+        dbFilmStorage.putLike(filmsId.get(4), usersId.get(2));
+        dbFilmStorage.putLike(filmsId.get(4), usersId.get(3));
+
+        // filmWithoutGenre id == 3, likes amount == 3
+        dbFilmStorage.putLike(filmsId.get(2), usersId.get(0));
+        dbFilmStorage.putLike(filmsId.get(2), usersId.get(1));
+        dbFilmStorage.putLike(filmsId.get(2), usersId.get(2));
+
+        // film id == 1, likes amount == 2
+        dbFilmStorage.putLike(filmsId.get(0), usersId.get(0));
+        dbFilmStorage.putLike(filmsId.get(0), usersId.get(1));
+
+        // filmWithoutAll id == 4, likes amount == 1
+        dbFilmStorage.putLike(filmsId.get(3), usersId.get(0));
+        // filmWithoutMpa id == 2, likes amount == 0
+        return filmsId;
     }
 }

@@ -32,4 +32,6 @@ public interface FilmStorage {
     List<Film> findByDirectorName(String query);
 
     List<Film> findByTitleOrDirectorName(String titleQuery, String directorQuery);
+
+    List<Film> getCommon(long userId, long friendId);
 }

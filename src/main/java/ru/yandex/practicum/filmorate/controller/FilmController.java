@@ -71,7 +71,6 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("DELETE /like: {}, {}", id, userId);
         filmService.deleteLike(id, userId);
@@ -101,5 +100,14 @@ public class FilmController {
         var films = filmService.searchFilms(query, by);
         log.info("completion GET /films/search: size {}", films.size());
         return films;
+    }
+
+    @GetMapping("/common")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Film> getCommon(@RequestParam Long userId, @RequestParam Long friendId) {
+        log.info("GET /common: userId={}, friendId={}", userId, friendId);
+        var resultFilms = filmService.getCommon(userId, friendId);
+        log.info("completion GET /common: userId={}, friendId={}, size={}", userId, friendId, resultFilms.size());
+        return resultFilms;
     }
 }
