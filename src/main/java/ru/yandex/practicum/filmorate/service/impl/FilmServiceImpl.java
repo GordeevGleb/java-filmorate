@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -63,6 +64,8 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getRecommendation(Long id) {
         Long userWithSimilarLikes = userStorage.findUserWithSimilarLikes(id);
-        return filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
+        if (userWithSimilarLikes > 0) {
+            return filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
+        } else return new ArrayList<>();
     }
 }

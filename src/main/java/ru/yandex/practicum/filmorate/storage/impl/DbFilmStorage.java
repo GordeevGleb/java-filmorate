@@ -321,10 +321,6 @@ public class DbFilmStorage implements FilmStorage {
                 "ORDER BY f.film_id;";
         var filmGenres = jdbcTemplate.query(sqlReadGenreQuery, this::makeFilmGenre);
         addGenreInFilms(films, filmGenres);
-        try {
             return films;
-        } catch (EmptyResultDataAccessException e) {
-            return new ArrayList<>();
-        }
     }
 }

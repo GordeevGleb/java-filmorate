@@ -34,7 +34,6 @@ class UserControllerTest {
 
     @MockBean
     private FilmService filmService;
-
     private static ObjectMapper mapper;
 
     @BeforeAll
