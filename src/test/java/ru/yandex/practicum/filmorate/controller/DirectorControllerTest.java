@@ -147,7 +147,7 @@ class DirectorControllerTest {
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.delete("/directors/-1");
 
         doThrow(new NotFoundException("director with id == -1 not found"))
-                .when(directorService) .delete(-1);
+                .when(directorService).delete(-1);
 
         mockMvc.perform(mockRequest)
                 .andExpect(status().isNotFound());
