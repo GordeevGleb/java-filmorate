@@ -11,10 +11,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,6 +44,7 @@ public class DbFilmStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery, namedParameters, keyHolder);
         film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         updateFilmGenre(film);
+        updateFilmDirector(film);
         return film;
     }
 
@@ -50,13 +52,13 @@ public class DbFilmStorage implements FilmStorage {
     @Transactional
     public Optional<Film> update(Film film) {
         String sqlUpdateQuery = "UPDATE film " +
-                "SET " +
-                "name = :name, " +
-                "description = :description, " +
-                "release_date = :release_date, " +
-                "duration = :duration, " +
-                "rating_id = :rating_id " +
-                "WHERE id = :id";
+                        "SET " +
+                        "name = :name, " +
+                        "description = :description, " +
+                        "release_date = :release_date, " +
+                        "duration = :duration, " +
+                        "rating_id = :rating_id " +
+                        "WHERE id = :id";
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("name", film.getName())
                 .addValue("description", film.getDescription())
@@ -71,6 +73,8 @@ public class DbFilmStorage implements FilmStorage {
         }
         jdbcTemplate.update("DELETE FROM film_genre WHERE film_id = :id", namedParameters);
         updateFilmGenre(film);
+        jdbcTemplate.update("DELETE FROM film_director WHERE film_id = :id", namedParameters);
+        updateFilmDirector(film);
         return Optional.of(film);
     }
 
@@ -84,11 +88,15 @@ public class DbFilmStorage implements FilmStorage {
                 "       f.rating_id,\n" +
                 "       r.name AS rating_name,\n" +
                 "       ARRAY_AGG(fg.genre_id) AS film_genres_id,\n" +
-                "       ARRAY_AGG(g.name) AS film_genres_name\n" +
+                "       ARRAY_AGG(g.name) AS film_genres_name,\n" +
+                "       ARRAY_AGG(fd.director_id) AS film_director_id,\n" +
+                "       ARRAY_AGG(d.name) AS film_director_name\n" +
                 "FROM film AS f\n" +
                 "LEFT JOIN rating AS r ON f.rating_id = r.id\n" +
                 "LEFT JOIN film_genre AS fg ON f.id = fg.film_id\n" +
                 "LEFT JOIN genre AS g ON fg.genre_id = g.id\n" +
+                "LEFT JOIN film_director AS fd ON f.id = fd.film_id\n" +
+                "LEFT JOIN director AS d ON fd.director_id = d.id\n" +
                 "GROUP BY f.id;";
         return jdbcTemplate.query(sqlReadFilmQuery, this::makeAllFilms);
     }
@@ -103,11 +111,15 @@ public class DbFilmStorage implements FilmStorage {
                 "       f.rating_id,\n" +
                 "       r.name AS rating_name,\n" +
                 "       ARRAY_AGG(fg.genre_id) AS film_genres_id,\n" +
-                "       ARRAY_AGG(g.name) AS film_genres_name\n" +
+                "       ARRAY_AGG(g.name) AS film_genres_name,\n" +
+                "       ARRAY_AGG(fd.director_id) AS film_director_id,\n" +
+                "       ARRAY_AGG(d.name) AS film_director_name\n" +
                 "FROM film AS f\n" +
                 "LEFT JOIN rating AS r ON f.rating_id = r.id\n" +
                 "LEFT JOIN film_genre AS fg ON f.id = fg.film_id\n" +
                 "LEFT JOIN genre AS g ON fg.genre_id = g.id\n" +
+                "LEFT JOIN film_director AS fd ON f.id = fd.film_id\n" +
+                "LEFT JOIN director AS d ON fd.director_id = d.id\n" +
                 "WHERE f.id = :id\n" +
                 "GROUP BY f.id;";
         SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
@@ -155,7 +167,66 @@ public class DbFilmStorage implements FilmStorage {
                 "ORDER BY f.film_id;";
         var filmGenres = jdbcTemplate.query(sqlReadGenreQuery, this::makeFilmGenre);
         addGenreInFilms(films, filmGenres);
+        String sqlReadDirectorQuery = "SELECT f.film_id,\n" +
+                "    f.director_id,\n" +
+                "    d.name\n" +
+                "FROM director AS d\n" +
+                "JOIN film_director AS f ON f.director_id = d.id\n" +
+                "ORDER BY f.film_id;";
+        var filmDirectors = jdbcTemplate.query(sqlReadDirectorQuery, this::makeFilmDirector);
+        addDirectorInFilms(films, filmDirectors);
         return films;
+    }
+
+    @Override
+    public List<Film> getByDirectorId(Long id, String sortBy) {
+        String sqlReadFilmQuery = getDirectorIdQuery(sortBy);
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("id", id);
+        var films = jdbcTemplate.query(sqlReadFilmQuery, namedParameters, this::makeFilms);
+        String sqlReadGenreQuery = "SELECT f.film_id,\n" +
+                "    f.genre_id,\n" +
+                "    g.name\n" +
+                "FROM genre AS g\n" +
+                "JOIN film_genre AS f ON f.genre_id = g.id\n" +
+                "ORDER BY f.film_id;";
+        var filmGenres = jdbcTemplate.query(sqlReadGenreQuery, this::makeFilmGenre);
+        addGenreInFilms(films, filmGenres);
+        String sqlReadDirectorQuery = "SELECT f.film_id,\n" +
+                "    f.director_id,\n" +
+                "    d.name\n" +
+                "FROM director AS d\n" +
+                "JOIN film_director AS f ON f.director_id = d.id\n" +
+                "ORDER BY f.film_id;";
+        var filmDirectors = jdbcTemplate.query(sqlReadDirectorQuery, this::makeFilmDirector);
+        addDirectorInFilms(films, filmDirectors);
+        return films;
+    }
+
+    private static String getDirectorIdQuery(String sortBy) {
+        String orderBy;
+        if ("year".equals(sortBy)) {
+            orderBy = "ORDER BY f.release_date";
+        } else {
+            orderBy = "ORDER BY COUNT(l.film_id) DESC";
+        }
+        return "SELECT f.id, " +
+                "    f.name AS film_name, " +
+                "    f.description, " +
+                "    f.release_date, " +
+                "    f.duration, " +
+                "    f.rating_id, " +
+                "    r.name AS rating_name " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r ON f.rating_id = r.id " +
+                "LEFT JOIN film_likes AS l ON f.id = l.film_id " +
+                "WHERE f.id IN ( " +
+                "   SELECT film_id " +
+                "   FROM film_director " +
+                "   WHERE director_id = :id " +
+                ") " +
+                "GROUP BY f.id " +
+                orderBy + ";";
     }
 
     private void addGenreInFilms(List<Film> films, List<FilmGenre> filmGenres) {
@@ -168,6 +239,20 @@ public class DbFilmStorage implements FilmStorage {
             var genres = genresMap.getOrDefault(film.getId(), new LinkedHashSet<>());
             for (var genre: genres) {
                 film.addGenre(genre);
+            }
+        }
+    }
+
+    private void addDirectorInFilms(List<Film> films, List<FilmDirector> filmDirectors) {
+        Map<Long, Set<Director>> genresMap = new HashMap<>();
+        for (var filmDirector: filmDirectors) {
+            genresMap.putIfAbsent(filmDirector.getId(), new LinkedHashSet<>());
+            genresMap.get(filmDirector.getId()).add(filmDirector.getDirector());
+        }
+        for (var film: films) {
+            var directors = genresMap.getOrDefault(film.getId(), new LinkedHashSet<>());
+            for (var director: directors) {
+                film.addDirector(director);
             }
         }
     }
@@ -193,6 +278,7 @@ public class DbFilmStorage implements FilmStorage {
                 releaseLocalDate,
                 resultSet.getInt("duration"),
                 rating,
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
     }
@@ -208,6 +294,7 @@ public class DbFilmStorage implements FilmStorage {
                 releaseLocalDate,
                 resultSet.getInt("duration"),
                 rating,
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
         var filmGenresId = resultSet.getArray("film_genres_id");
@@ -225,6 +312,21 @@ public class DbFilmStorage implements FilmStorage {
                 film.addGenre(new Genre(genresId[i], genresName[i]));
             }
         }
+        var filmDirectorId = resultSet.getArray("film_director_id");
+        var filmDirectorName = resultSet.getArray("film_director_name");
+        if (filmDirectorId != null &&  filmDirectorName != null) {
+            var directorId = Arrays.stream((Object[]) filmDirectorId.getArray())
+                    .filter(Objects::nonNull)
+                    .mapToLong((t) -> (Long) t)
+                    .toArray();
+            var directorName = Arrays.stream((Object[]) filmDirectorName.getArray())
+                    .filter(Objects::nonNull)
+                    .map(String::valueOf)
+                    .toArray(String[]::new);
+            for (var i = 0; i < directorId.length && i < directorName.length; ++i) {
+                film.addDirector(new Director(directorId[i], directorName[i]));
+            }
+        }
         return film;
     }
 
@@ -240,6 +342,7 @@ public class DbFilmStorage implements FilmStorage {
                     releaseLocalDate,
                     resultSet.getInt("duration"),
                     rating,
+                    new LinkedHashSet<>(),
                     new LinkedHashSet<>()
             );
 
@@ -256,6 +359,21 @@ public class DbFilmStorage implements FilmStorage {
                         .toArray(String[]::new);
                 for (var i = 0; i < genresId.length && i < genresName.length; ++i) {
                     film.addGenre(new Genre(genresId[i], genresName[i]));
+                }
+            }
+            var filmDirectorId = resultSet.getArray("film_director_id");
+            var filmDirectorName = resultSet.getArray("film_director_name");
+            if (filmDirectorId != null &&  filmDirectorName != null) {
+                var directorId = Arrays.stream((Object[]) filmDirectorId.getArray())
+                        .filter(Objects::nonNull)
+                        .mapToLong((t) -> (Long) t)
+                        .toArray();
+                var directorName = Arrays.stream((Object[]) filmDirectorName.getArray())
+                        .filter(Objects::nonNull)
+                        .map(String::valueOf)
+                        .toArray(String[]::new);
+                for (var i = 0; i < directorId.length && i < directorName.length; ++i) {
+                    film.addDirector(new Director(directorId[i], directorName[i]));
                 }
             }
             return Optional.of(film);
@@ -275,6 +393,12 @@ public class DbFilmStorage implements FilmStorage {
         );
     }
 
+    private FilmDirector makeFilmDirector(ResultSet resultSet, int rowNum) throws SQLException {
+        return new FilmDirector(resultSet.getLong("film_id"),
+                new Director(resultSet.getInt("director_id"), resultSet.getString("name"))
+        );
+    }
+
     private void updateFilmGenre(Film film) {
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             var batch = SqlParameterSourceUtils.createBatch(film.getGenres().stream()
@@ -284,10 +408,29 @@ public class DbFilmStorage implements FilmStorage {
         }
     }
 
+    private void updateFilmDirector(Film film) {
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+            var batch = SqlParameterSourceUtils.createBatch(film.getDirectors().stream()
+                    .map(t -> (Map.of("film_id", film.getId(), "director_id", t.getId())))
+                    .collect(Collectors.toList()));
+            jdbcTemplate.batchUpdate(
+                    "INSERT INTO film_director(film_id, director_id) " +
+                            "VALUES (:film_id, :director_id)",
+                    batch);
+        }
+    }
+
     @Data
     @AllArgsConstructor
     private static class FilmGenre {
         private long id;
         private Genre genre;
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class FilmDirector {
+        private long id;
+        private Director director;
     }
 }
