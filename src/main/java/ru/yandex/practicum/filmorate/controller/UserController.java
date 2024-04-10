@@ -85,6 +85,7 @@ public class UserController {
         log.info("completion GET /friends/common: size {}", result.size());
         return result;
     }
+
     @GetMapping("/{id}/recommendations")
     public List<Film> getRecommendations(@PathVariable Long id) {
         log.info("GET / recommendations: {}", id);
