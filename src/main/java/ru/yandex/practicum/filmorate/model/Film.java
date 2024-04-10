@@ -1,50 +1,41 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
-import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.util.MinimumDate;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Setter;
+import ru.yandex.practicum.filmorate.util.ReleaseDateConstraint;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.LinkedHashSet;
 
-
-@Component
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
+/**
+ * Film.
+ */
+@Data
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-@ToString
 public class Film {
-    private Long id;
-    @NotNull(message = "Название фильма не существует")
-    @NotBlank(message = "Название фильма не может быть пустым")
+    private long id;
+    @NotBlank
     private String name;
-    @Size(max = 200, message = "Размер описания не должен превышать 200 символов")
+    @Size(max = 200)
     private String description;
-    @MinimumDate
-    @NotNull(message = "Дата выхода не существует")
+    @ReleaseDateConstraint
     private LocalDate releaseDate;
-    @Positive(message = "Длительность фильма не может быть отрицательной")
-    private Long duration;
+    @Min(1)
+    private int duration;
     private Mpa mpa;
-    private List<Genre> genres = new ArrayList<>();
-    @JsonIgnore
-    private List<Long> likes = new ArrayList<>();
+    @Setter(AccessLevel.NONE)
+    private final LinkedHashSet<Genre> genres;
 
-    public Map<String, Object> toMap() {
-        Map<String, Object> values = new HashMap<>();
-        values.put("FILM_TITLE", name);
-        values.put("FILM_DESCRIPTION", description);
-        values.put("FILM_RELEASE_DATE", releaseDate);
-        values.put("FILM_DURATION", duration);
-        values.put("FILM_MPA_ID", mpa.getId());
-        return values;
+    public Film() {
+        this.genres = new LinkedHashSet<>();
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
     }
 }

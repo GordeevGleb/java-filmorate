@@ -1,27 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 
-
 public interface UserService {
-    boolean addFriend(Long userId, Long friendId) throws UserNotFoundException;
 
-    void deleteFriend(Long userId, Long friendId) throws UserNotFoundException;
+    User addUser(User user);
 
-    List<User> getUsersFriends(Long userId) throws UserNotFoundException;
+    User changeUser(User user);
 
-    List<User> getMutualFriends(Long userId1, Long userId2) throws UserNotFoundException;
+    List<User> getUsers();
 
-    public User addUser(User user);
+    User getById(Long id);
 
-    public User updateUser(User user) throws UserNotFoundException;
+    void addFriends(Long id, Long friendId);
 
-    public List<User> getAllUsers();
+    void deleteFriends(Long id, Long friendId);
 
-    public User deleteUser(long userId);
+    List<User> getFriends(Long id);
 
-    public User getUserById(long userId) throws UserNotFoundException;
+    List<User> getCommonFriends(Long id, Long secondId);
 }

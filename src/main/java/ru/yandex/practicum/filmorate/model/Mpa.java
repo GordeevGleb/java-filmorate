@@ -1,17 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-
-@Component
-@Builder
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-@ToString
 public class Mpa {
     private int id;
     private String name;

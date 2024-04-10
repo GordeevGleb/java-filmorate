@@ -1,24 +1,25 @@
 package ru.yandex.practicum.filmorate.dao;
 
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.FriendService;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserStorage extends FriendService {
-    public User addUser(User user);
+public interface UserStorage {
 
-    public User deleteUser(long userId);
+    User create(User user);
 
-    public Optional<User> updateUser(User user) throws UserNotFoundException;
+    Optional<User> update(User user);
 
-    public List<User> getAllUsers();
+    List<User> findAll();
 
-    public Optional<User> getUserById(long userId) throws UserNotFoundException;
+    Optional<User> findById(Long id);
 
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException;
+    void addFriends(Long id, Long friendId);
+
+    void deleteFriends(Long id, Long friendId);
+
+    List<User> getFriends(Long id);
+
+    List<User> getCommonFriends(Long id, Long otherId);
 }
