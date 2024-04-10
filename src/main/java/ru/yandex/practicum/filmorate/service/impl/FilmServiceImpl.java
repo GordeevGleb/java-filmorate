@@ -2,11 +2,12 @@ package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public class FilmServiceImpl implements FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final DirectorStorage directorStorage;
 
     @Override
     public Film addFilm(Film film) {
@@ -26,7 +28,7 @@ public class FilmServiceImpl implements FilmService {
     public Film changeFilm(Film film) {
         return filmStorage.update(film)
                 .orElseThrow(() -> new NotFoundException(String.format("film with id %d not found", film.getId()))
-                );
+        );
     }
 
     @Override
@@ -38,7 +40,7 @@ public class FilmServiceImpl implements FilmService {
     public Film getFilm(Long id) {
         return filmStorage.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("film with id %d not found", id))
-                );
+        );
     }
 
     @Override
@@ -59,4 +61,13 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> getPopular(int count) {
         return filmStorage.getPopular(count);
     }
+
+    @Override
+    public List<Film> getByDirectorId(Long id, String sortBy) {
+        if (directorStorage.findById(id).isEmpty()) {
+            throw new NotFoundException(String.format("director with id == %d not found", id));
+        }
+        return filmStorage.getByDirectorId(id, sortBy);
+    }
+
 }

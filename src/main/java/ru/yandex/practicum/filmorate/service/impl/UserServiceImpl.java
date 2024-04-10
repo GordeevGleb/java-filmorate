@@ -3,10 +3,10 @@ package ru.yandex.practicum.filmorate.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     public User changeUser(User user) {
         return userStorage.update(user)
                 .orElseThrow(() -> new NotFoundException(String.format("user with id %d not found", user.getId()))
-                );
+        );
     }
 
     @Override
