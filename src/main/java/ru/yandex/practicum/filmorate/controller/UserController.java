@@ -90,7 +90,7 @@ public class UserController {
     public List<Film> getRecommendations(@PathVariable Long id) {
         log.info("GET / recommendations: {}", id);
         List<Film> resultList = filmService.getRecommendation(id);
-        log.info("completion GET /recommendations: size {}", resultList.size());
+        log.info("completion GET /recommendations: size: {}", resultList.size());
         return resultList;
     }
 }
