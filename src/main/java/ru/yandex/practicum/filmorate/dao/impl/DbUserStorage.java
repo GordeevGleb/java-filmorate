@@ -176,8 +176,7 @@ public class DbUserStorage implements UserStorage {
                 "ORDER BY count(*) desc limit 1";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, namedParameters, Long.class);
-        }
-        catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException e) {
             return userId;
         }
     }
