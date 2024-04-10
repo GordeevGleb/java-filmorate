@@ -59,4 +59,9 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> getPopular(int count) {
         return filmStorage.getPopular(count);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        filmStorage.deleteById(id);
+    }
 }
