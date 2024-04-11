@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.utils.SortingConstraint;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -77,5 +78,20 @@ public class FilmController {
         log.info("completion GET /popular: size {}", resultFilms.size());
         return resultFilms;
     }
-}
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getByDirectorId(@PathVariable Long directorId, @RequestParam @SortingConstraint String sortBy) {
+        log.info("GET /director/{directorId}?sortBy: {}, {}", directorId, sortBy);
+        var films = filmService.getByDirectorId(directorId, sortBy);
+        log.info("completion PUT /like: success");
+        return films;
+    }
+
+    @GetMapping("/search")
+    public List<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
+        log.info("GET /films/search?query={}, by={}", query, by);
+        var films = filmService.searchFilms(query, by);
+        log.info("completion GET /films/search: size {}", films.size());
+        return films;
+    }
+}

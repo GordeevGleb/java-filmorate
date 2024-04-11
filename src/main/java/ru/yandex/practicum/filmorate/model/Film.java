@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Setter;
-import ru.yandex.practicum.filmorate.util.ReleaseDateConstraint;
+import ru.yandex.practicum.filmorate.utils.ReleaseDateConstraint;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -30,12 +30,19 @@ public class Film {
     private Mpa mpa;
     @Setter(AccessLevel.NONE)
     private final LinkedHashSet<Genre> genres;
+    @Setter(AccessLevel.NONE)
+    private final LinkedHashSet<Director> directors;
 
     public Film() {
         this.genres = new LinkedHashSet<>();
+        this.directors = new LinkedHashSet<>();
     }
 
     public void addGenre(Genre genre) {
         genres.add(genre);
+    }
+
+    public void addDirector(Director director) {
+        this.directors.add(director);
     }
 }
