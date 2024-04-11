@@ -73,12 +73,12 @@ public class DbDirectorStorage implements DirectorStorage {
 
     private Optional<Director> makeDirector(ResultSet resultSet) throws SQLException {
         if (resultSet.next()) {
-            return Optional.of(new Director(resultSet.getInt("id"), resultSet.getString("name")));
+            return Optional.of(new Director(resultSet.getLong("id"), resultSet.getString("name")));
         }
         return Optional.empty();
     }
 
     private Director makeDirectors(ResultSet resultSet, int rowNum) throws SQLException {
-        return new Director(resultSet.getInt("id"), resultSet.getString("name"));
+        return new Director(resultSet.getLong("id"), resultSet.getString("name"));
     }
 }
