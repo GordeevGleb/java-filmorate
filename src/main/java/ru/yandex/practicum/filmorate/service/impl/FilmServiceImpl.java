@@ -64,8 +64,10 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getRecommendation(Long id) {
         Long userWithSimilarLikes = userStorage.findUserWithSimilarLikes(id);
+        List<Film> resultList = new ArrayList<>();
         if (userWithSimilarLikes != null) {
-            return filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
-        } else return new ArrayList<>();
+            resultList = filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
+        }
+        return resultList;
     }
 }
