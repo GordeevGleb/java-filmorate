@@ -102,7 +102,7 @@ public class ReviewServiceImpl implements ReviewService {
         log.info("DELETE \"/reviews/{id}/like/{userId}\".");
         reviewExsistsCheck(reviewId);
         userExsistsCheck(userId);
-        reviewStorage.addDislike(reviewId, userId);
+        reviewStorage.deleteLikeOrDislike(reviewId, userId);
         log.info(String.format("Удалён лайк отзыву id=[%s] от пользователя id=[%s]", reviewId, userId));
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -112,7 +112,7 @@ public class ReviewServiceImpl implements ReviewService {
         log.info("DELETE \"/reviews/{id}/dislike/{userId}\".");
         reviewExsistsCheck(reviewId);
         userExsistsCheck(userId);
-        reviewStorage.addLike(reviewId, userId);
+        reviewStorage.deleteLikeOrDislike(reviewId, userId);
         log.info(String.format("Удалён дизлайк отзыву id=[%s] от пользователя id=[%s]", reviewId, userId));
         return new ResponseEntity<>(HttpStatus.OK);
     }
