@@ -76,6 +76,12 @@ public class DbUserStorage implements UserStorage {
     }
 
     @Override
+    public void deleteById(Long id) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+        jdbcTemplate.update("DELETE FROM users WHERE id = :id", namedParameters);
+    }
+
+    @Override
     public void addFriends(Long userId, Long friendId) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("user_id", userId)

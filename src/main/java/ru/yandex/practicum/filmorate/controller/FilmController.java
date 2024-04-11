@@ -55,6 +55,14 @@ public class FilmController {
         return resultFilm;
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) {
+        log.info("DELETE /film: {}", id);
+        filmService.deleteById(id);
+        log.info("completion DELETE /film: {} success", id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public void putLike(@PathVariable Long id, @PathVariable Long userId) {
         log.info("PUT /like: {}, {}", id, userId);
