@@ -21,5 +21,5 @@ public interface FilmService {
 
     List<Film> getByDirectorId(Long id, String sortBy);
 
-    void deleteById(Long id);
+    void delete(Long id);
 }

@@ -14,7 +14,7 @@ public interface UserService {
 
     User getById(Long id);
 
-    void deleteById(Long id);
+    void delete(Long id);
 
     void addFriends(Long id, Long friendId);
 

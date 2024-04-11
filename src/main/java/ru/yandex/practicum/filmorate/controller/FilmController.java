@@ -57,9 +57,9 @@ public class FilmController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         log.info("DELETE /film: {}", id);
-        filmService.deleteById(id);
+        filmService.delete(id);
         log.info("completion DELETE /film: {} success", id);
     }
 
