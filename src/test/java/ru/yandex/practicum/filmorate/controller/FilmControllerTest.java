@@ -249,4 +249,12 @@ class FilmControllerTest {
         mockMvc.perform(mockRequest)
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void getDirectorFailSortBy() throws Exception {
+        var mockRequest = MockMvcRequestBuilders.get("/films/director/1?sortBy=asdfgh")
+                .contentType(MediaType.APPLICATION_JSON);
+        mockMvc.perform(mockRequest)
+                .andExpect(status().isBadRequest());
+    }
 }
