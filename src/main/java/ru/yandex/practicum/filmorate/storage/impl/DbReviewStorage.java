@@ -21,7 +21,7 @@ public class DbReviewStorage implements ReviewStorage {
 
     @Override
     public long addAndReturnId(Review review) {
-        String sqlQuery = "insert into review (content, is_positive, user_id, film_id, useful) values (?, ?, ?, ?, ?)";
+        String sqlQuery = "insert into review (content, is_positive, user_id, film_id) values (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -31,7 +31,6 @@ public class DbReviewStorage implements ReviewStorage {
             ps.setBoolean(2, review.getIsPositive());
             ps.setLong(3, review.getUserId());
             ps.setLong(4, review.getFilmId());
-            ps.setLong(5, review.getUseful());
             return ps;
         }, keyHolder);
 
@@ -47,39 +46,51 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public boolean deleteReview(long id) {
+    public void deleteReview(long id) {
         String sqlQuery = "delete from review where id = ?";
-        return jdbcTemplate.update(sqlQuery, id) > 0;
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
     public Review getById(long id) {
-        String sqlQuery = "select * from review where id = ?";
+        String sqlQuery = "select r.*, (select count(*) from review_likes where review_id = r.id and is_like = true)" +
+                " - (select count(*) from review_likes where review_id = r.id and is_like = false) as useful " +
+                "from review r where r.id = ? ";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToReview, id);
     }
 
     @Override
     public Collection<Review> getAll(long count) {
-        String sqlQuery = "select * from review order by useful desc limit ?";
+        String sqlQuery = "select r.*, (select count(*) from review_likes where review_id = r.id and is_like = true)" +
+                " - (select count(*) from review_likes where review_id = r.id and is_like = false) as useful " +
+                "from review r order by useful desc limit ? ";
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, count);
     }
 
     @Override
     public Collection<Review> getFilmReviews(long filmId, long count) {
-        String sqlQuery = "select * from review where film_id = ? order by useful desc limit ?";
+        String sqlQuery = "select r.*, (select count(*) from review_likes where review_id = r.id and is_like = true)" +
+                " - (select count(*) from review_likes where review_id = r.id and is_like = false) as useful " +
+                "from review r where film_id = ? order by useful desc limit ? ";
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, filmId, count);
     }
 
     @Override
     public void addLike(long reviewId, long userId) {
-        String sqlQuery = "update review set useful = useful + 1 WHERE id = ? ";
-        jdbcTemplate.update(sqlQuery, reviewId);
+        String sqlQuery = "insert into review_likes (review_id, user_id, is_like) values (?, ?, ?)";
+        jdbcTemplate.update(sqlQuery, reviewId, userId, true);
     }
 
     @Override
     public void addDislike(long reviewId, long userId) {
-        String sqlQuery = "update review set useful = useful - 1 WHERE id = ? ";
-        jdbcTemplate.update(sqlQuery, reviewId);
+        String sqlQuery = "insert into review_likes (review_id, user_id, is_like) values (?, ?, ?)";
+        jdbcTemplate.update(sqlQuery, reviewId, userId, false);
+    }
+
+    @Override
+    public void deleteLikeOrDislike(long reviewId, long userId) {
+        String sqlQuery = "delete from review_likes where review_id = ? and user_id = ? ";
+        jdbcTemplate.update(sqlQuery, reviewId, userId);
     }
 
     @Override
