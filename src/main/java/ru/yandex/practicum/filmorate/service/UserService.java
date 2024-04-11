@@ -24,5 +24,4 @@ public interface UserService {
 
     List<User> getCommonFriends(Long id, Long secondId);
 
-    void deleteById(Long id);
 }

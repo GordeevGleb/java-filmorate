@@ -44,11 +44,6 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public void deleteById(Long id) {
-        filmStorage.deleteById(id);
-    }
-
-    @Override
     public void putLike(Long id, Long userId) {
         userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("PUT like: user id %d not found", userId)));
@@ -74,7 +69,6 @@ public class FilmServiceImpl implements FilmService {
         }
         return filmStorage.getByDirectorId(id, sortBy);
     }
-
 
     @Override
     public void deleteById(Long id) {
