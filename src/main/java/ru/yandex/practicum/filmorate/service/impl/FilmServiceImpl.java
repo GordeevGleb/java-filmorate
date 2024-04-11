@@ -75,4 +75,9 @@ public class FilmServiceImpl implements FilmService {
         return filmStorage.getByDirectorId(id, sortBy);
     }
 
+
+    @Override
+    public void deleteById(Long id) {
+        filmStorage.deleteById(id);
+    }
 }
