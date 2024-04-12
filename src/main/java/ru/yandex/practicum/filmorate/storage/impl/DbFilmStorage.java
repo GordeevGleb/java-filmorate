@@ -453,8 +453,17 @@ public class DbFilmStorage implements FilmStorage {
                 "FROM genre AS g\n" +
                 "JOIN film_genre AS f ON f.genre_id = g.id\n" +
                 "ORDER BY f.film_id;";
+        String sqlReadDirectorQuery = "SELECT f.film_id,\n" +
+                "    f.director_id,\n" +
+                "    d.name\n" +
+                "FROM director AS d\n" +
+                "JOIN film_director AS f ON f.director_id = d.id\n" +
+                "ORDER BY f.film_id;";
+        var filmDirectors = jdbcTemplate.query(sqlReadDirectorQuery, this::makeFilmDirector);
         var filmGenres = jdbcTemplate.query(sqlReadGenreQuery, this::makeFilmGenre);
         addGenreInFilms(films, filmGenres);
+        addDirectorInFilms(films, filmDirectors);
+
         return films;
     }
 
