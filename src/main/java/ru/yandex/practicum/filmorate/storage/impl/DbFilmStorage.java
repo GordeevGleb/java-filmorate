@@ -269,15 +269,18 @@ public class DbFilmStorage implements FilmStorage {
                 "       fg.genre_id AS film_genres_id, " +
                 "       g.name AS film_genres_name, " +
                 "       fd.director_id AS film_director_id, " +
-                "       d.name AS film_director_name " +
+                "       d.name AS film_director_name, " +
+                "       COUNT(fl.film_id) AS like_count " +
                 "FROM film AS f " +
                 "LEFT JOIN rating AS r ON f.rating_id = r.id " +
                 "LEFT JOIN film_genre AS fg ON f.id = fg.film_id " +
                 "LEFT JOIN genre AS g ON fg.genre_id = g.id " +
                 "LEFT JOIN film_director AS fd ON f.id = fd.film_id " +
                 "LEFT JOIN director AS d ON fd.director_id = d.id " +
-                "WHERE LOWER(f.name) LIKE LOWER(:titleQuery) OR LOWER(d.name) LIKE LOWER(:directorQuery)" +
-                "ORDER BY f.release_date DESC";
+                "LEFT JOIN film_likes AS fl ON f.id = fl.film_id " +
+                "WHERE LOWER(f.name) LIKE LOWER(:titleQuery) OR LOWER(d.name) LIKE LOWER(:directorQuery) " +
+                "GROUP BY f.id " +
+                "ORDER BY like_count DESC";
 
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("titleQuery", "%" + titleQuery + "%")
