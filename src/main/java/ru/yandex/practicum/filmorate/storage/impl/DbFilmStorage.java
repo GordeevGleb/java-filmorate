@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.impl.dao;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -127,6 +127,12 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void delete(Long id) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+        jdbcTemplate.update("DELETE FROM film WHERE id = :id", namedParameters);
+    }
+
+    @Override
     public void putLike(Long filmId, Long userId) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("film_id", filmId)
@@ -201,32 +207,6 @@ public class DbFilmStorage implements FilmStorage {
         var filmDirectors = jdbcTemplate.query(sqlReadDirectorQuery, this::makeFilmDirector);
         addDirectorInFilms(films, filmDirectors);
         return films;
-    }
-
-    private static String getDirectorIdQuery(String sortBy) {
-        String orderBy;
-        if ("year".equals(sortBy)) {
-            orderBy = "ORDER BY f.release_date";
-        } else {
-            orderBy = "ORDER BY COUNT(l.film_id) DESC";
-        }
-        return "SELECT f.id, " +
-                "    f.name AS film_name, " +
-                "    f.description, " +
-                "    f.release_date, " +
-                "    f.duration, " +
-                "    f.rating_id, " +
-                "    r.name AS rating_name " +
-                "FROM film AS f " +
-                "LEFT JOIN rating AS r ON f.rating_id = r.id " +
-                "LEFT JOIN film_likes AS l ON f.id = l.film_id " +
-                "WHERE f.id IN ( " +
-                "   SELECT film_id " +
-                "   FROM film_director " +
-                "   WHERE director_id = :id " +
-                ") " +
-                "GROUP BY f.id " +
-                orderBy + ";";
     }
 
     @Override
@@ -304,6 +284,32 @@ public class DbFilmStorage implements FilmStorage {
                 .addValue("directorQuery", "%" + directorQuery + "%");
 
         return jdbcTemplate.query(sqlQuery, namedParameters, this::makeAllFilms);
+    }
+
+    private static String getDirectorIdQuery(String sortBy) {
+        String orderBy;
+        if ("year".equals(sortBy)) {
+            orderBy = "ORDER BY f.release_date";
+        } else {
+            orderBy = "ORDER BY COUNT(l.film_id) DESC";
+        }
+        return "SELECT f.id, " +
+                "    f.name AS film_name, " +
+                "    f.description, " +
+                "    f.release_date, " +
+                "    f.duration, " +
+                "    f.rating_id, " +
+                "    r.name AS rating_name " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r ON f.rating_id = r.id " +
+                "LEFT JOIN film_likes AS l ON f.id = l.film_id " +
+                "WHERE f.id IN ( " +
+                "   SELECT film_id " +
+                "   FROM film_director " +
+                "   WHERE director_id = :id " +
+                ") " +
+                "GROUP BY f.id " +
+                orderBy + ";";
     }
 
     private void addGenreInFilms(List<Film> films, List<FilmGenre> filmGenres) {

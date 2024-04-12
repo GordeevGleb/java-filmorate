@@ -9,8 +9,8 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +69,11 @@ public class FilmServiceImpl implements FilmService {
             throw new NotFoundException(String.format("director with id == %d not found", id));
         }
         return filmStorage.getByDirectorId(id, sortBy);
+    }
+
+    @Override
+    public void delete(Long id) {
+        filmStorage.delete(id);
     }
 
     @Override
