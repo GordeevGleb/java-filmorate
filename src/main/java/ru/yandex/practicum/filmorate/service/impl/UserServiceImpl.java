@@ -42,6 +42,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void delete(Long id) {
+        userStorage.delete(id);
+    }
+
+    @Override
     public void addFriends(Long id, Long friendId) {
         if (id.equals(friendId)) {
             throw new ValidationException("PUT friends: id equals friendId");

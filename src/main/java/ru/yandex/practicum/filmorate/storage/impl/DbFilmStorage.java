@@ -127,6 +127,12 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void delete(Long id) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+        jdbcTemplate.update("DELETE FROM film WHERE id = :id", namedParameters);
+    }
+
+    @Override
     public void putLike(Long filmId, Long userId) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("film_id", filmId)

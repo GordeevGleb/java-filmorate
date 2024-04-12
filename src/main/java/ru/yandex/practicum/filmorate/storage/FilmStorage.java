@@ -15,6 +15,8 @@ public interface FilmStorage {
 
     Optional<Film> findById(Long id);
 
+    void delete(Long id);
+
     void putLike(Long id, Long userId);
 
     void deleteLike(Long id, Long userId);
@@ -22,4 +24,5 @@ public interface FilmStorage {
     List<Film> getPopular(int count);
 
     List<Film> getByDirectorId(Long id, String sortBy);
+
 }
