@@ -426,6 +426,38 @@ public class DbFilmStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public List<Film> getFilmRecommendation(Long userId, Long userWithSimilarLikesId) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("user_id", userId)
+                .addValue("another_user_id", userWithSimilarLikesId);
+        String sqlQuery = "SELECT film.id," +
+                "       film.name AS film_name," +
+                "       film.description," +
+                "       film.release_date," +
+                "       film.duration," +
+                "       film.rating_id," +
+                "       r.name AS rating_name " +
+                "FROM film " +
+                "LEFT JOIN rating AS r ON film.rating_id = r.id " +
+                "WHERE film.ID IN (SELECT FILM_ID" +
+                "             FROM FILM_LIKES" +
+                "             WHERE USER_ID = :another_user_id)" +
+                "  AND film.ID NOT IN (SELECT FILM_ID" +
+                "                 FROM FILM_LIKES" +
+                "                 WHERE USER_ID = :user_id) " +
+                "GROUP BY FILM.ID;";
+        var films = jdbcTemplate.query(sqlQuery, namedParameters, this::makeFilms);
+        String sqlReadGenreQuery = "SELECT f.film_id,\n" +
+                "    f.genre_id,\n" +
+                "    g.name\n" +
+                "FROM genre AS g\n" +
+                "JOIN film_genre AS f ON f.genre_id = g.id\n" +
+                "ORDER BY f.film_id;";
+        var filmGenres = jdbcTemplate.query(sqlReadGenreQuery, this::makeFilmGenre);
+        addGenreInFilms(films, filmGenres);
+        return films;
+    }
+
     @Data
     @AllArgsConstructor
     private static class FilmGenre {
