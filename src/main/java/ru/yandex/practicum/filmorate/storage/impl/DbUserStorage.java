@@ -40,12 +40,12 @@ public class DbUserStorage implements UserStorage {
     public Optional<User> update(User user) {
         String sqlUpdateQuery =
                 "UPDATE users " +
-                        "SET " +
-                        "email = :email, " +
-                        "login = :login, " +
-                        "name = :name, " +
-                        "birthday = :birthday " +
-                        "WHERE id = :id";
+                "SET " +
+                    "email = :email, " +
+                    "login = :login, " +
+                    "name = :name, " +
+                    "birthday = :birthday " +
+                "WHERE id = :id";
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("email", user.getEmail())
                 .addValue("login", user.getLogin())
@@ -64,7 +64,7 @@ public class DbUserStorage implements UserStorage {
     public List<User> findAll() {
         String sqlQuery =
                 "SELECT * " +
-                        "FROM users;";
+                "FROM users;";
         return jdbcTemplate.query(sqlQuery, this::makeUsers);
     }
 
@@ -101,7 +101,7 @@ public class DbUserStorage implements UserStorage {
     public List<User> getFriends(Long id) {
         SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
         String sqlQuery =
-                "SELECT u.id,\n" +
+                        "SELECT u.id,\n" +
                         "       u.email,\n" +
                         "       u.login,\n" +
                         "       u.name,\n" +

@@ -19,7 +19,7 @@ public class GenreServiceImpl implements GenreService {
     public Genre getById(int id) {
         return genreStorage.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("genre with id == %d not found", id))
-                );
+        );
     }
 
     @Override

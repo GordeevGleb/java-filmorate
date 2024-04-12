@@ -29,7 +29,7 @@ public class FilmServiceImpl implements FilmService {
     public Film changeFilm(Film film) {
         return filmStorage.update(film)
                 .orElseThrow(() -> new NotFoundException(String.format("film with id %d not found", film.getId()))
-                );
+        );
     }
 
     @Override
@@ -41,7 +41,7 @@ public class FilmServiceImpl implements FilmService {
     public Film getFilm(Long id) {
         return filmStorage.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("film with id %d not found", id))
-                );
+        );
     }
 
     @Override

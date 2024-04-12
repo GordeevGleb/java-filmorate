@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     public User changeUser(User user) {
         return userStorage.update(user)
                 .orElseThrow(() -> new NotFoundException(String.format("user with id %d not found", user.getId()))
-                );
+        );
     }
 
     @Override
