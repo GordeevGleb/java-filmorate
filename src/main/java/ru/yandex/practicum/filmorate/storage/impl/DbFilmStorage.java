@@ -312,32 +312,6 @@ public class DbFilmStorage implements FilmStorage {
                 orderBy + ";";
     }
 
-    private static String getDirectorIdQuery(String sortBy) {
-        String orderBy;
-        if ("year".equals(sortBy)) {
-            orderBy = "ORDER BY f.release_date";
-        } else {
-            orderBy = "ORDER BY COUNT(l.film_id) DESC";
-        }
-        return "SELECT f.id, " +
-                "    f.name AS film_name, " +
-                "    f.description, " +
-                "    f.release_date, " +
-                "    f.duration, " +
-                "    f.rating_id, " +
-                "    r.name AS rating_name " +
-                "FROM film AS f " +
-                "LEFT JOIN rating AS r ON f.rating_id = r.id " +
-                "LEFT JOIN film_likes AS l ON f.id = l.film_id " +
-                "WHERE f.id IN ( " +
-                "   SELECT film_id " +
-                "   FROM film_director " +
-                "   WHERE director_id = :id " +
-                ") " +
-                "GROUP BY f.id " +
-                orderBy + ";";
-    }
-
     private void addGenreInFilms(List<Film> films, List<FilmGenre> filmGenres) {
         Map<Long, Set<Genre>> genresMap = new HashMap<>();
         for (var filmGenre: filmGenres) {
