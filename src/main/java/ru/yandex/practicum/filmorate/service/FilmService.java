@@ -22,7 +22,7 @@ public interface FilmService {
     List<Film> getByDirectorId(Long id, String sortBy);
 
     void delete(Long id);
-    
+
     List<Film> getRecommendation(Long id);
 
     List<Film> searchFilms(String query, String by);
