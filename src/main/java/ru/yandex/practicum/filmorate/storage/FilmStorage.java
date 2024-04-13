@@ -27,9 +27,9 @@ public interface FilmStorage {
 
     List<Film> getFilmRecommendation(Long userId, Long userWithSimilarLikesId);
 
-    List<Film> findByTitleContaining(String query);
+    List<Film> findByTitle(String query);
 
-    List<Film> findByDirectorNameContaining(String query);
+    List<Film> findByDirectorName(String query);
 
-    List<Film> findByTitleContainingOrDirectorNameContaining(String titleQuery, String directorQuery);
+    List<Film> findByTitleOrDirectorName(String titleQuery, String directorQuery);
 }

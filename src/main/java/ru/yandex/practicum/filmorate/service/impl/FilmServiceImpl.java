@@ -86,28 +86,26 @@ public class FilmServiceImpl implements FilmService {
         return filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
     }
 
-    @Override
     public List<Film> searchFilms(String query, String by) {
+        final String DIRECTOR = "director";
+        final String TITLE = "title";
+
         String[] byArray = by.split(",");
 
         if (byArray.length == 1) {
-            if (byArray[0].equalsIgnoreCase("director")) {
-                return filmStorage.findByDirectorNameContaining(query);
-            } else if (byArray[0].equalsIgnoreCase("title")) {
-                return filmStorage.findByTitleContaining(query);
-            } else {
-                throw new IllegalArgumentException("Invalid 'by' parameter: " + byArray[0]);
+            if (DIRECTOR.equals(byArray[0])) {
+                return filmStorage.findByDirectorName(query);
+            } else if (TITLE.equals(byArray[0])) {
+                return filmStorage.findByTitle(query);
             }
         } else if (byArray.length == 2) {
-            if (byArray[0].equalsIgnoreCase("director") || byArray[1].equalsIgnoreCase("title")) {
-                return filmStorage.findByTitleContainingOrDirectorNameContaining(query, query);
-            } else if (byArray[0].equalsIgnoreCase("title") || byArray[1].equalsIgnoreCase("director")) {
-                return filmStorage.findByTitleContainingOrDirectorNameContaining(query, query);
-            } else {
-                throw new IllegalArgumentException("Invalid 'by' parameter: " + by);
+            if (DIRECTOR.equals(byArray[0]) || TITLE.equals(byArray[1])) {
+                return filmStorage.findByTitleOrDirectorName(query, query);
+            } else if (TITLE.equals(byArray[0]) || DIRECTOR.equals(byArray[1])) {
+                return filmStorage.findByTitleOrDirectorName(query, query);
             }
-        } else {
-            throw new IllegalArgumentException("Invalid 'by' parameter: " + by);
         }
+
+        throw new IllegalArgumentException("Invalid 'by' parameter: " + by);
     }
 }
