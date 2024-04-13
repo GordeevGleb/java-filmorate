@@ -94,4 +94,12 @@ public class FilmController {
         log.info("completion PUT /like: success");
         return films;
     }
+
+    @GetMapping("/search")
+    public List<Film> searchFilms(@RequestParam String query, @RequestParam String by) {
+        log.info("GET /films/search?query={}, by={}", query, by);
+        var films = filmService.searchFilms(query, by);
+        log.info("completion GET /films/search: size {}", films.size());
+        return films;
+    }
 }

@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -83,5 +84,28 @@ public class FilmServiceImpl implements FilmService {
             return new ArrayList<>();
         }
         return filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
+    }
+
+    public List<Film> searchFilms(String query, String by) {
+        final String DIRECTOR = "director";
+        final String TITLE = "title";
+
+        String[] byArray = by.split(",");
+
+        if (byArray.length == 1) {
+            if (DIRECTOR.equals(byArray[0])) {
+                return filmStorage.findByDirectorName(query);
+            } else if (TITLE.equals(byArray[0])) {
+                return filmStorage.findByTitle(query);
+            }
+        } else if (byArray.length == 2) {
+            if (DIRECTOR.equals(byArray[0]) || TITLE.equals(byArray[1])) {
+                return filmStorage.findByTitleOrDirectorName(query, query);
+            } else if (TITLE.equals(byArray[0]) || DIRECTOR.equals(byArray[1])) {
+                return filmStorage.findByTitleOrDirectorName(query, query);
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid 'by' parameter: " + by);
     }
 }

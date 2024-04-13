@@ -209,6 +209,143 @@ public class DbFilmStorage implements FilmStorage {
         return films;
     }
 
+    @Override
+    public List<Film> getFilmRecommendation(Long userId, Long userWithSimilarLikesId) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("user_id", userId)
+                .addValue("another_user_id", userWithSimilarLikesId);
+        String sqlQuery = "SELECT film.id," +
+                "       film.name AS film_name," +
+                "       film.description," +
+                "       film.release_date," +
+                "       film.duration," +
+                "       film.rating_id," +
+                "       r.name AS rating_name " +
+                "FROM film " +
+                "LEFT JOIN rating AS r ON film.rating_id = r.id " +
+                "WHERE film.ID IN (SELECT FILM_ID" +
+                "             FROM FILM_LIKES" +
+                "             WHERE USER_ID = :another_user_id)" +
+                "  AND film.ID NOT IN (SELECT FILM_ID" +
+                "                 FROM FILM_LIKES" +
+                "                 WHERE USER_ID = :user_id) " +
+                "GROUP BY FILM.ID;";
+        var films = jdbcTemplate.query(sqlQuery, namedParameters, this::makeFilms);
+        String sqlReadGenreQuery = "SELECT f.film_id,\n" +
+                "    f.genre_id,\n" +
+                "    g.name\n" +
+                "FROM genre AS g\n" +
+                "JOIN film_genre AS f ON f.genre_id = g.id\n" +
+                "ORDER BY f.film_id;";
+        String sqlReadDirectorQuery = "SELECT f.film_id,\n" +
+                "    f.director_id,\n" +
+                "    d.name\n" +
+                "FROM director AS d\n" +
+                "JOIN film_director AS f ON f.director_id = d.id\n" +
+                "ORDER BY f.film_id;";
+        var filmDirectors = jdbcTemplate.query(sqlReadDirectorQuery, this::makeFilmDirector);
+        var filmGenres = jdbcTemplate.query(sqlReadGenreQuery, this::makeFilmGenre);
+        addGenreInFilms(films, filmGenres);
+        addDirectorInFilms(films, filmDirectors);
+
+        return films;
+    }
+
+    @Override
+    public List<Film> findByTitle(String query) {
+        String sqlQuery = "SELECT f.id, " +
+                "       f.name AS film_name, " +
+                "       f.description, " +
+                "       f.release_date, " +
+                "       f.duration, " +
+                "       f.rating_id, " +
+                "       r.name AS rating_name, " +
+                "       GROUP_CONCAT(DISTINCT fg.genre_id) AS film_genres_id, " +
+                "       GROUP_CONCAT(DISTINCT g.name) AS film_genres_name, " +
+                "       GROUP_CONCAT(DISTINCT fd.director_id) AS film_director_id, " +
+                "       GROUP_CONCAT(DISTINCT d.name) AS film_director_name " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r ON f.rating_id = r.id " +
+                "LEFT JOIN film_genre AS fg ON f.id = fg.film_id " +
+                "LEFT JOIN genre AS g ON fg.genre_id = g.id " +
+                "LEFT JOIN film_director AS fd ON f.id = fd.film_id " +
+                "LEFT JOIN director AS d ON fd.director_id = d.id " +
+                "WHERE LOWER(f.name) LIKE LOWER(:query) " +
+                "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, r.name";
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("query", "%" + query + "%");
+        return jdbcTemplate.query(sqlQuery, namedParameters, this::makeAllFilms);
+    }
+
+    @Override
+    public List<Film> findByDirectorName(String query) {
+        String sqlQuery = "SELECT f.id, " +
+                "       f.name AS film_name, " +
+                "       f.description, " +
+                "       f.release_date, " +
+                "       f.duration, " +
+                "       f.rating_id, " +
+                "       r.name AS rating_name " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r ON f.rating_id = r.id " +
+                "WHERE f.id IN (SELECT fd.film_id FROM film_director AS fd " +
+                "               INNER JOIN director AS d ON fd.director_id = d.id " +
+                "               WHERE LOWER(d.name) LIKE LOWER(:query))";
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("query", "%" + query + "%");
+        var films = jdbcTemplate.query(sqlQuery, namedParameters, this::makeFilms);
+
+        String sqlReadGenreQuery = "SELECT f.film_id, " +
+                "    f.genre_id, " +
+                "    g.name " +
+                "FROM genre AS g " +
+                "JOIN film_genre AS f ON f.genre_id = g.id " +
+                "ORDER BY f.film_id";
+        var filmGenres = jdbcTemplate.query(sqlReadGenreQuery, this::makeFilmGenre);
+        addGenreInFilms(films, filmGenres);
+
+        String sqlReadDirectorQuery = "SELECT f.film_id, " +
+                "    f.director_id, " +
+                "    d.name " +
+                "FROM director AS d " +
+                "JOIN film_director AS f ON f.director_id = d.id " +
+                "ORDER BY f.film_id";
+        var filmDirectors = jdbcTemplate.query(sqlReadDirectorQuery, this::makeFilmDirector);
+        addDirectorInFilms(films, filmDirectors);
+
+        return films;
+    }
+
+    @Override
+    public List<Film> findByTitleOrDirectorName(String titleQuery, String directorQuery) {
+        String sqlQuery = "SELECT DISTINCT f.id, " +
+                "       f.name AS film_name, " +
+                "       f.description, " +
+                "       f.release_date, " +
+                "       f.duration, " +
+                "       f.rating_id, " +
+                "       r.name AS rating_name, " +
+                "       fg.genre_id AS film_genres_id, " +
+                "       g.name AS film_genres_name, " +
+                "       fd.director_id AS film_director_id, " +
+                "       d.name AS film_director_name, " +
+                "       COUNT(fl.film_id) AS like_count " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r ON f.rating_id = r.id " +
+                "LEFT JOIN film_genre AS fg ON f.id = fg.film_id " +
+                "LEFT JOIN genre AS g ON fg.genre_id = g.id " +
+                "LEFT JOIN film_director AS fd ON f.id = fd.film_id " +
+                "LEFT JOIN director AS d ON fd.director_id = d.id " +
+                "LEFT JOIN film_likes AS fl ON f.id = fl.film_id " +
+                "WHERE LOWER(f.name) LIKE LOWER(:titleQuery) OR LOWER(d.name) LIKE LOWER(:directorQuery) " +
+                "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, r.name, " +
+                "         fg.genre_id, g.name, fd.director_id, d.name " +
+                "ORDER BY like_count DESC";
+
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("titleQuery", "%" + titleQuery + "%")
+                .addValue("directorQuery", "%" + directorQuery + "%");
+
+        return jdbcTemplate.query(sqlQuery, namedParameters, this::makeAllFilms);
+    }
+
     private static String getDirectorIdQuery(String sortBy) {
         String orderBy;
         if ("year".equals(sortBy)) {
@@ -424,47 +561,6 @@ public class DbFilmStorage implements FilmStorage {
                             "VALUES (:film_id, :director_id)",
                     batch);
         }
-    }
-
-    @Override
-    public List<Film> getFilmRecommendation(Long userId, Long userWithSimilarLikesId) {
-        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("user_id", userId)
-                .addValue("another_user_id", userWithSimilarLikesId);
-        String sqlQuery = "SELECT film.id," +
-                "       film.name AS film_name," +
-                "       film.description," +
-                "       film.release_date," +
-                "       film.duration," +
-                "       film.rating_id," +
-                "       r.name AS rating_name " +
-                "FROM film " +
-                "LEFT JOIN rating AS r ON film.rating_id = r.id " +
-                "WHERE film.ID IN (SELECT FILM_ID" +
-                "             FROM FILM_LIKES" +
-                "             WHERE USER_ID = :another_user_id)" +
-                "  AND film.ID NOT IN (SELECT FILM_ID" +
-                "                 FROM FILM_LIKES" +
-                "                 WHERE USER_ID = :user_id) " +
-                "GROUP BY FILM.ID;";
-        var films = jdbcTemplate.query(sqlQuery, namedParameters, this::makeFilms);
-        String sqlReadGenreQuery = "SELECT f.film_id,\n" +
-                "    f.genre_id,\n" +
-                "    g.name\n" +
-                "FROM genre AS g\n" +
-                "JOIN film_genre AS f ON f.genre_id = g.id\n" +
-                "ORDER BY f.film_id;";
-        String sqlReadDirectorQuery = "SELECT f.film_id,\n" +
-                "    f.director_id,\n" +
-                "    d.name\n" +
-                "FROM director AS d\n" +
-                "JOIN film_director AS f ON f.director_id = d.id\n" +
-                "ORDER BY f.film_id;";
-        var filmDirectors = jdbcTemplate.query(sqlReadDirectorQuery, this::makeFilmDirector);
-        var filmGenres = jdbcTemplate.query(sqlReadGenreQuery, this::makeFilmGenre);
-        addGenreInFilms(films, filmGenres);
-        addDirectorInFilms(films, filmDirectors);
-
-        return films;
     }
 
     @Data
