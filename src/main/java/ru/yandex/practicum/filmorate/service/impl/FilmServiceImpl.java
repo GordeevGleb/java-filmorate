@@ -76,6 +76,7 @@ public class FilmServiceImpl implements FilmService {
     public void delete(Long id) {
         filmStorage.delete(id);
     }
+
     @Override
     public List<Film> getRecommendation(Long id) {
         Long userWithSimilarLikes = userStorage.findUserWithSimilarLikes(id);
@@ -84,7 +85,7 @@ public class FilmServiceImpl implements FilmService {
         }
         return filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
     }
-  
+
     @Override
     public List<Film> searchFilms(String query, String by) {
         System.out.println("Query: " + query);
