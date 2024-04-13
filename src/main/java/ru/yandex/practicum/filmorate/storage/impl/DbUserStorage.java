@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -168,5 +169,21 @@ public class DbUserStorage implements UserStorage {
             ));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Long findUserWithSimilarLikes(Long userId) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("user_id", userId);
+        String sqlQuery = "SELECT fl2.user_id " +
+                "FROM FILM_LIKES AS fl1, FILM_LIKES AS fl2 " +
+                "WHERE fl1.film_id = fl2.film_id " +
+                "AND fl1.user_id = :user_id AND fl1.user_id <> fl2.user_id " +
+                "GROUP BY fl1.user_id, fl2.user_id " +
+                "ORDER BY count(*) desc limit 1";
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, namedParameters, Long.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 }

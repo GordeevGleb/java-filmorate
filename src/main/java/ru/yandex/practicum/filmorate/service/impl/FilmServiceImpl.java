@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -75,7 +76,15 @@ public class FilmServiceImpl implements FilmService {
     public void delete(Long id) {
         filmStorage.delete(id);
     }
-
+    @Override
+    public List<Film> getRecommendation(Long id) {
+        Long userWithSimilarLikes = userStorage.findUserWithSimilarLikes(id);
+        if (userWithSimilarLikes == null) {
+            return new ArrayList<>();
+        }
+        return filmStorage.getFilmRecommendation(id, userWithSimilarLikes);
+    }
+  
     @Override
     public List<Film> searchFilms(String query, String by) {
         System.out.println("Query: " + query);
