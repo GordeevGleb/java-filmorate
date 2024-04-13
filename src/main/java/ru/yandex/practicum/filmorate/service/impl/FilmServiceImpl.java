@@ -88,32 +88,26 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> searchFilms(String query, String by) {
-        System.out.println("Query: " + query);
-        System.out.println("By: " + by);
-
         String[] byArray = by.split(",");
-        List<Film> films = new ArrayList<>();
 
         if (byArray.length == 1) {
             if (byArray[0].equalsIgnoreCase("director")) {
-                System.out.println("Method findByDirectorNameContaining is called!");
-                films.addAll(filmStorage.findByDirectorNameContaining(query));
+                return filmStorage.findByDirectorNameContaining(query);
             } else if (byArray[0].equalsIgnoreCase("title")) {
-                System.out.println("Method findByTitleContaining is called!");
-                films.addAll(filmStorage.findByTitleContaining(query));
+                return filmStorage.findByTitleContaining(query);
             } else {
                 throw new IllegalArgumentException("Invalid 'by' parameter: " + byArray[0]);
             }
         } else if (byArray.length == 2) {
-            String titleQuery = query;
-            String directorQuery = query;
-
-            System.out.println("Method findByTitleContainingOrDirectorNameContaining is called with title and director!");
-            films.addAll(filmStorage.findByTitleContainingOrDirectorNameContaining(titleQuery, directorQuery));
+            if (byArray[0].equalsIgnoreCase("director") || byArray[1].equalsIgnoreCase("title")) {
+                return filmStorage.findByTitleContainingOrDirectorNameContaining(query, query);
+            } else if (byArray[0].equalsIgnoreCase("title") || byArray[1].equalsIgnoreCase("director")) {
+                return filmStorage.findByTitleContainingOrDirectorNameContaining(query, query);
+            } else {
+                throw new IllegalArgumentException("Invalid 'by' parameter: " + by);
+            }
         } else {
             throw new IllegalArgumentException("Invalid 'by' parameter: " + by);
         }
-
-        return films;
     }
 }

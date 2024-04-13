@@ -218,34 +218,35 @@ public class DbFilmStorage implements FilmStorage {
                 "       f.duration, " +
                 "       f.rating_id, " +
                 "       r.name AS rating_name, " +
-                "       fg.genre_id AS film_genres_id, " +
-                "       g.name AS film_genres_name, " +
-                "       fd.director_id AS film_director_id, " +
-                "       d.name AS film_director_name " +
+                "       GROUP_CONCAT(DISTINCT fg.genre_id) AS film_genres_id, " +
+                "       GROUP_CONCAT(DISTINCT g.name) AS film_genres_name, " +
+                "       GROUP_CONCAT(DISTINCT fd.director_id) AS film_director_id, " +
+                "       GROUP_CONCAT(DISTINCT d.name) AS film_director_name " +
                 "FROM film AS f " +
                 "LEFT JOIN rating AS r ON f.rating_id = r.id " +
                 "LEFT JOIN film_genre AS fg ON f.id = fg.film_id " +
                 "LEFT JOIN genre AS g ON fg.genre_id = g.id " +
                 "LEFT JOIN film_director AS fd ON f.id = fd.film_id " +
                 "LEFT JOIN director AS d ON fd.director_id = d.id " +
-                "WHERE LOWER(f.name) LIKE LOWER(:query)";
+                "WHERE LOWER(f.name) LIKE LOWER(:query) " +
+                "GROUP BY f.id, f.name, f.description, f.release_date, f.duration, f.rating_id, r.name";
         SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("query", "%" + query + "%");
         return jdbcTemplate.query(sqlQuery, namedParameters, this::makeAllFilms);
     }
 
     @Override
     public List<Film> findByDirectorNameContaining(String query) {
-        String sqlQuery = "SELECT f.id, " +
-                "    f.name AS film_name, " +
-                "    f.description, " +
-                "    f.release_date, " +
-                "    f.duration, " +
-                "    f.rating_id, " +
-                "    r.name AS rating_name, " +
-                "    fg.genre_id AS film_genres_id, " +
-                "    g.name AS film_genres_name, " +
-                "    fd.director_id AS film_director_id, " +
-                "    d.name AS film_director_name " +
+        String sqlQuery = "SELECT DISTINCT f.id, " +
+                "       f.name AS film_name, " +
+                "       f.description, " +
+                "       f.release_date, " +
+                "       f.duration, " +
+                "       f.rating_id, " +
+                "       r.name AS rating_name, " +
+                "       fg.genre_id AS film_genres_id, " +
+                "       g.name AS film_genres_name, " +
+                "       fd.director_id AS film_director_id, " +
+                "       d.name AS film_director_name " +
                 "FROM film AS f " +
                 "LEFT JOIN rating AS r ON f.rating_id = r.id " +
                 "LEFT JOIN film_genre AS fg ON f.id = fg.film_id " +
@@ -259,7 +260,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findByTitleContainingOrDirectorNameContaining(String titleQuery, String directorQuery) {
-        String sqlQuery = "SELECT f.id, " +
+        String sqlQuery = "SELECT DISTINCT f.id, " +
                 "       f.name AS film_name, " +
                 "       f.description, " +
                 "       f.release_date, " +
