@@ -3,13 +3,18 @@ package ru.yandex.practicum.filmorate.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -20,6 +25,7 @@ public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final DirectorStorage directorStorage;
+    private final FeedStorage feedStorage;
 
     @Override
     public Film addFilm(Film film) {
@@ -49,6 +55,7 @@ public class FilmServiceImpl implements FilmService {
     public void putLike(Long id, Long userId) {
         userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("PUT like: user id %d not found", userId)));
+        feedStorage.recordEvent(new Feed(new Date().getTime(), userId, EventType.LIKE, Operation.ADD, id));
         filmStorage.putLike(id, userId);
     }
 
@@ -56,6 +63,7 @@ public class FilmServiceImpl implements FilmService {
     public void deleteLike(Long id, Long userId) {
         userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("user with id == %d not found", userId)));
+        feedStorage.recordEvent(new Feed(new Date().getTime(), userId, EventType.LIKE, Operation.REMOVE, id));
         filmStorage.deleteLike(id, userId);
     }
 

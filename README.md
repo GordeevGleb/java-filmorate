@@ -80,4 +80,27 @@ Table film_director {
 
 Ref: director.id < film_director.director_id
 Ref: film.id < film_director.film_id
+
+Table event_type {
+  id bigint [primary key]
+  name varchar [not null, unique]
+}
+
+Table operation {
+  id bigint [primary key]
+  name varchar [not null, unique]
+}
+
+Table feed {
+  event_id bigint [primary key]
+  timestamp bigint [not null]
+  user_id bigint
+  event_type int
+  operation int
+  entity_id bigint [not null]
+}
+
+Ref: feed.user_id < users.id
+Ref: feed.event_type < event_type.id
+Ref: feed.operation < operation.id
 ```
