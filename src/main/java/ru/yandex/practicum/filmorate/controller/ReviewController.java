@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.Collection;
-import java.util.Optional;
 
 @Slf4j
 @Validated
@@ -55,7 +54,7 @@ public class ReviewController {
     }
 
     @GetMapping
-    public Collection<Review> getAll(@RequestParam Optional<Long> filmId,
+    public Collection<Review> getAll(@RequestParam(required = false) Long filmId,
                                      @Min(1) @RequestParam(defaultValue = "10") long count) {
         log.info("GET /reviews: all");
         var resultReviews = reviewService.getAll(filmId, count);

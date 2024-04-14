@@ -9,9 +9,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import javax.validation.ValidationException;
 import java.util.Collection;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -54,11 +52,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Collection<Review> getAll(Optional<Long> filmId, long count) {
-        if (filmId.isEmpty()) {
+    public Collection<Review> getAll(Long filmId, long count) {
+        if (filmId == null) {
             return reviewStorage.getAll(count);
         }
-        return reviewStorage.getFilmReviews(filmId.get(), count);
+        return reviewStorage.getFilmReviews(filmId, count);
     }
 
     @Override

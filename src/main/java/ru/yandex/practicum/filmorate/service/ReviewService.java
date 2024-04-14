@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.Collection;
-import java.util.Optional;
 
 public interface ReviewService {
     Review add(Review review);
@@ -14,7 +13,7 @@ public interface ReviewService {
 
     Review getById(long id);
 
-    Collection<Review> getAll(Optional<Long> filmId, long count);
+    Collection<Review> getAll(Long filmId, long count);
 
     void addLike(long reviewId, long userId);
 
