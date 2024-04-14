@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.FeedService;
+import ru.yandex.practicum.filmorate.model.Feed;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,6 +23,7 @@ public class UserController {
     private final UserService userService;
 
     private final FilmService filmService;
+    private final FeedService feedService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -100,5 +103,13 @@ public class UserController {
         List<Film> resultList = filmService.getRecommendation(id);
         log.info("completion GET /recommendations: size {}", resultList.size());
         return resultList;
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Feed> getUserFeed(@PathVariable Long id) {
+        log.info("GET /users/{}/feed", id);
+        var result = feedService.getUserFeed(id);
+        log.info("completion GET /users/{}/feed : {}", id, result);
+        return result;
     }
 }

@@ -4,12 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -17,6 +22,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
+    private final FeedStorage feedStorage;
 
     @Override
     public User addUser(User user) {
@@ -53,6 +59,7 @@ public class UserServiceImpl implements UserService {
         }
         try {
             userStorage.addFriends(id, friendId);
+            feedStorage.recordEvent(new Feed(new Date().getTime(), id, EventType.FRIEND, Operation.ADD,  friendId));
         } catch (DataIntegrityViolationException e) {
             throw new NotFoundException("user or friend not found");
         }
@@ -70,6 +77,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException(String.format("friend with id == %d not found", id));
         }
         userStorage.deleteFriends(id, friendId);
+        feedStorage.recordEvent(new Feed(new Date().getTime(), id, EventType.FRIEND, Operation.REMOVE,  friendId));
     }
 
     @Override
