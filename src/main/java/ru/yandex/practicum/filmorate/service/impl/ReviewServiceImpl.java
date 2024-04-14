@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ConstraintException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -24,21 +21,21 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review addReview(Review review) {
-        userExsistsCheck(review.getUserId());
-        filmExsistsCheck(review.getFilmId());
+        userExistsCheck(review.getUserId());
+        filmExistsCheck(review.getFilmId());
         review.setReviewId(reviewStorage.addAndReturnId(review));
         return review;
     }
 
     @Override
     public Review updateReview(Review review) {
-        reviewExsistsCheck(review.getReviewId());
+        reviewExistsCheck(review.getReviewId());
         return reviewStorage.update(review);
     }
 
     @Override
     public void deleteReview(long id) {
-        reviewExsistsCheck(id);
+        reviewExistsCheck(id);
         reviewStorage.deleteReview(id);
     }
 
@@ -49,7 +46,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Collection<Review> getReviews(long filmId, long count) {
-        Collection<Review> reviews;
         if (count == 0) {
             count = 10;
         }
@@ -61,39 +57,39 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addLike(long reviewId, long userId) {
-        reviewExsistsCheck(reviewId);
-        userExsistsCheck(userId);
+        reviewExistsCheck(reviewId);
+        userExistsCheck(userId);
         reviewStorage.addLike(reviewId, userId);
     }
 
     @Override
     public void addDislike(long reviewId, long userId) {
-        reviewExsistsCheck(reviewId);
-        userExsistsCheck(userId);
+        reviewExistsCheck(reviewId);
+        userExistsCheck(userId);
         reviewStorage.addDislike(reviewId, userId);
     }
 
     @Override
     public void deleteLike(long reviewId, long userId) {
-        reviewExsistsCheck(reviewId);
-        userExsistsCheck(userId);
+        reviewExistsCheck(reviewId);
+        userExistsCheck(userId);
         reviewStorage.deleteLikeOrDislike(reviewId, userId);
     }
 
     @Override
     public void deleteDislike(long reviewId, long userId) {
-        reviewExsistsCheck(reviewId);
-        userExsistsCheck(userId);
+        reviewExistsCheck(reviewId);
+        userExistsCheck(userId);
         reviewStorage.deleteLikeOrDislike(reviewId, userId);
     }
 
-    private void reviewExsistsCheck(long id) {
+    private void reviewExistsCheck(long id) {
         if (!reviewStorage.reviewExists(id)) {
             throw new NotFoundException(String.format("Отзыв id=[%s] не найден.", id));
         }
     }
 
-    private void filmExsistsCheck(long id) {
+    private void filmExistsCheck(long id) {
         if (id == 0) {
             throw new ConstraintException("Фильм не может быть null");
         }
@@ -102,7 +98,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    private void userExsistsCheck(long id) {
+    private void userExistsCheck(long id) {
         if (id == 0) {
             throw new ConstraintException("Пользователь не может быть null");
         }
