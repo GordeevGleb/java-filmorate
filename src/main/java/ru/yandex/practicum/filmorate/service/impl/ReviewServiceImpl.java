@@ -22,17 +22,11 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review add(Review review) {
-        if (review.getUserId().isEmpty()) {
-            throw new ValidationException("[userId] field is empty");
+        if (!isUserExists(review.getUserId())) {
+            throw new NotFoundException(String.format("user with id == %d not found", review.getUserId()));
         }
-        if (review.getFilmId().isEmpty()) {
-            throw new ValidationException("[filmId] field is empty");
-        }
-        if (!isUserExists(review.getUserId().get())) {
-            throw new NotFoundException(String.format("user with id == %d not found", review.getUserId().get()));
-        }
-        if (!isFilmExists(review.getFilmId().get())) {
-            throw new NotFoundException(String.format("film with id == %d not found", review.getFilmId().get()));
+        if (!isFilmExists(review.getFilmId())) {
+            throw new NotFoundException(String.format("film with id == %d not found", review.getFilmId()));
         }
         review.setReviewId(reviewStorage.addAndReturnId(review));
         return review;

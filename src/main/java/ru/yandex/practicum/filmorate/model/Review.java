@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 @Data
@@ -13,7 +14,9 @@ public class Review {
     @NotBlank
     private String content;
     private Boolean isPositive;
-    private Optional<Long> userId;
-    private Optional<Long> filmId;
+    @NotNull
+    private Long userId;
+    @NotNull
+    private Long filmId;
     private long useful;
 }
