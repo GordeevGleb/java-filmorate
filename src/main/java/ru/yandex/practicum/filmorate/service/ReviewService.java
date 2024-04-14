@@ -3,23 +3,22 @@ package ru.yandex.practicum.filmorate.service;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface ReviewService {
-    Review addReview(Review review);
+    Review add(Review review);
 
-    Review updateReview(Review review);
+    Review update(Review review);
 
-    void deleteReview(long id);
+    void delete(long id);
 
-    Review getReviewById(long id);
+    Review getById(long id);
 
-    Collection<Review> getReviews(long filmId, long count);
+    Collection<Review> getAll(Optional<Long> filmId, long count);
 
     void addLike(long reviewId, long userId);
 
     void addDislike(long reviewId, long userId);
 
-    void deleteLike(long reviewId, long userId);
-
-    void deleteDislike(long reviewId, long userId);
+    void deleteLikeOrDislike(long reviewId, long userId);
 }

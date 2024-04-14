@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -22,42 +23,42 @@ public class ReviewController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Review addReview(@Valid @RequestBody Review review) {
+    public Review add(@Valid @RequestBody Review review) {
         log.info("POST /reviews: {}", review.toString());
-        var resultReview = reviewService.addReview(review);
+        var resultReview = reviewService.add(review);
         log.info("completion POST /reviews: {}", resultReview);
         return resultReview;
     }
 
     @PutMapping
-    public Review updateReview(@Valid @RequestBody Review review) {
+    public Review update(@Valid @RequestBody Review review) {
         log.info("PUT /reviews: {}", review.toString());
-        var resultReview = reviewService.updateReview(review);
+        var resultReview = reviewService.update(review);
         log.info("completion PUT /reviews: {}", resultReview);
         return resultReview;
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReview(@PathVariable long id) {
+    public void delete(@PathVariable long id) {
         log.info("DELETE /reviews: {}", id);
-        reviewService.deleteReview(id);
+        reviewService.delete(id);
         log.info("completion DELETE /like: success");
     }
 
     @GetMapping("/{id}")
-    public Review getReviewByID(@PathVariable long id) {
+    public Review getByID(@PathVariable long id) {
         log.info("GET /reviews: {}", id);
-        var resultReview = reviewService.getReviewById(id);
+        var resultReview = reviewService.getById(id);
         log.info("completion GET /reviews: {}", resultReview);
         return resultReview;
     }
 
     @GetMapping
-    public Collection<Review> getReviews(@RequestParam Optional<Long> filmId,
-                                         @RequestParam(defaultValue = "10") long count) {
+    public Collection<Review> getAll(@RequestParam Optional<Long> filmId,
+                                     @Min(1) @RequestParam(defaultValue = "10") long count) {
         log.info("GET /reviews: all");
-        var resultReviews = reviewService.getReviews(filmId.orElseGet(() -> 0L), count);
+        var resultReviews = reviewService.getAll(filmId, count);
         log.info("completion GET /reviews: size {}", resultReviews.size());
         return resultReviews;
     }
@@ -80,7 +81,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(@PathVariable long id, @PathVariable long userId) {
         log.info("DELETE /reviews/like: {}, {}", id, userId);
-        reviewService.deleteLike(id, userId);
+        reviewService.deleteLikeOrDislike(id, userId);
         log.info("completion DELETE /reviews/like: success");
     }
 
@@ -88,7 +89,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDislike(@PathVariable long id, @PathVariable long userId) {
         log.info("DELETE /reviews/dislike: {}, {}", id, userId);
-        reviewService.deleteDislike(id, userId);
+        reviewService.deleteLikeOrDislike(id, userId);
         log.info("completion DELETE /reviews/dislike: success");
     }
 }

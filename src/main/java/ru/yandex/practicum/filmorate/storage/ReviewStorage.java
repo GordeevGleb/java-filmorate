@@ -9,7 +9,7 @@ public interface ReviewStorage {
 
     Review update(Review review);
 
-    void deleteReview(long id);
+    void delete(long id);
 
     Review getById(long id);
 
@@ -23,5 +23,5 @@ public interface ReviewStorage {
 
     void deleteLikeOrDislike(long reviewId, long userId);
 
-    boolean reviewExists(long id);
+    boolean isReviewExists(long id);
 }

@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,8 +30,8 @@ public class DbReviewStorage implements ReviewStorage {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, review.getContent());
             ps.setBoolean(2, review.getIsPositive());
-            ps.setLong(3, review.getUserId());
-            ps.setLong(4, review.getFilmId());
+            ps.setLong(3, review.getUserId().get());
+            ps.setLong(4, review.getFilmId().get());
             return ps;
         }, keyHolder);
 
@@ -46,7 +47,7 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public void deleteReview(long id) {
+    public void delete(long id) {
         String sqlQuery = "delete from review where id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }
@@ -94,7 +95,7 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public boolean reviewExists(long id) {
+    public boolean isReviewExists(long id) {
         String sqlQuery = "select count(*) from review where id = ?";
         Integer count = jdbcTemplate.queryForObject(sqlQuery, Integer.class, id);
         return count != null && count > 0;
@@ -105,8 +106,8 @@ public class DbReviewStorage implements ReviewStorage {
                 .reviewId(resultSet.getLong("id"))
                 .content(resultSet.getString("content"))
                 .isPositive(resultSet.getBoolean("is_positive"))
-                .userId(resultSet.getLong("user_id"))
-                .filmId(resultSet.getLong("film_id"))
+                .userId(Optional.of(resultSet.getLong("user_id")))
+                .filmId(Optional.of(resultSet.getLong("film_id")))
                 .useful(resultSet.getLong("useful"))
                 .build();
     }
