@@ -59,10 +59,10 @@ public class UserServiceImpl implements UserService {
         }
         try {
             userStorage.addFriends(id, friendId);
-            feedStorage.recordEvent(new Feed(new Date().getTime(), id, EventType.FRIEND, Operation.ADD,  friendId));
         } catch (DataIntegrityViolationException e) {
             throw new NotFoundException("user or friend not found");
         }
+        feedStorage.recordEvent(new Feed(new Date().getTime(), id, EventType.FRIEND, Operation.ADD,  friendId));
     }
 
     @Override

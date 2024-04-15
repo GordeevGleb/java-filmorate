@@ -44,9 +44,10 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format("review with id == %d not found", review.getReviewId()));
         }
         Review oldReview = reviewStorage.getById(review.getReviewId());
+        Review newReview = reviewStorage.update(review);
         feedStorage.recordEvent(new Feed(new Date().getTime(), oldReview.getUserId(),
                 EventType.REVIEW, Operation.UPDATE, oldReview.getReviewId()));
-        return reviewStorage.update(review);
+        return newReview;
     }
 
     @Override

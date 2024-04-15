@@ -55,16 +55,16 @@ public class FilmServiceImpl implements FilmService {
     public void putLike(Long id, Long userId) {
         userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("PUT like: user id %d not found", userId)));
-        feedStorage.recordEvent(new Feed(new Date().getTime(), userId, EventType.LIKE, Operation.ADD, id));
         filmStorage.putLike(id, userId);
+        feedStorage.recordEvent(new Feed(new Date().getTime(), userId, EventType.LIKE, Operation.ADD, id));
     }
 
     @Override
     public void deleteLike(Long id, Long userId) {
         userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("user with id == %d not found", userId)));
-        feedStorage.recordEvent(new Feed(new Date().getTime(), userId, EventType.LIKE, Operation.REMOVE, id));
         filmStorage.deleteLike(id, userId);
+        feedStorage.recordEvent(new Feed(new Date().getTime(), userId, EventType.LIKE, Operation.REMOVE, id));
     }
 
     @Override
