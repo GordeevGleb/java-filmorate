@@ -116,4 +116,12 @@ public class FilmServiceImpl implements FilmService {
 
         throw new IllegalArgumentException("Invalid 'by' parameter: " + by);
     }
+
+    @Override
+    public List<Film> getCommon(long userId, long friendId) {
+        userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("user with id == %d not found", userId)));
+
+        return filmStorage.getCommon(userId, friendId);
+    }
 }

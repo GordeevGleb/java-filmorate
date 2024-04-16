@@ -372,6 +372,52 @@ public class DbFilmStorage implements FilmStorage {
                 orderBy + ";";
     }
 
+    @Override
+    public List<Film> getCommon(long userId, long friendId) {
+        String sqlReadFilmQuery = "WITH common_ids AS (\n" +
+                "    SELECT film_id\n" +
+                "    FROM film_likes\n" +
+                "    WHERE user_id = :userId AND film_id IN (\n" +
+                "        SELECT film_id\n" +
+                "        FROM film_likes\n" +
+                "        WHERE user_id = :friendId\n" +
+                "    )\n" +
+                ")\n" +
+                "SELECT f.id,\n" +
+                "    f.name AS film_name,\n" +
+                "    f.description,\n" +
+                "    f.release_date,\n" +
+                "    f.duration,\n" +
+                "    f.rating_id,\n" +
+                "    r.name AS rating_name,\n" +
+                "    (SELECT ARRAY_AGG(genre_id)\n" +
+                "     FROM film_genre\n" +
+                "     WHERE film_id = f.id) AS film_genres_id,\n" +
+                "     \n" +
+                "    (SELECT ARRAY_AGG(name)\n" +
+                "     FROM genre\n" +
+                "     WHERE id IN (SELECT genre_id FROM film_genre WHERE film_id = f.id)) AS film_genres_name,\n" +
+                "     \n" +
+                "    (SELECT ARRAY_AGG(director_id)\n" +
+                "     FROM film_director\n" +
+                "     WHERE film_id = f.id) AS film_director_id,\n" +
+                "     \n" +
+                "    (SELECT ARRAY_AGG(name)\n" +
+                "     FROM director\n" +
+                "     WHERE id IN (SELECT director_id FROM film_director WHERE film_id = f.id)) AS film_director_name\n" +
+                "\n" +
+                "FROM film f INNER JOIN common_ids ON f.id = common_ids.film_id\n" +
+                "INNER JOIN film_likes fl ON f.id = fl.film_id\n" +
+                "INNER JOIN rating r ON f.rating_id = r.id\n" +
+                "GROUP BY f.id\n" +
+                "ORDER BY count(fl.film_id) DESC;";
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("userId", userId)
+                .addValue("friendId", friendId);
+
+        return jdbcTemplate.query(sqlReadFilmQuery, namedParameters, this::makeAllFilms);
+    }
+
     private void addGenreInFilms(List<Film> films, List<FilmGenre> filmGenres) {
         Map<Long, Set<Genre>> genresMap = new HashMap<>();
         for (var filmGenre: filmGenres) {
@@ -540,6 +586,10 @@ public class DbFilmStorage implements FilmStorage {
         return new FilmDirector(resultSet.getLong("film_id"),
                 new Director(resultSet.getInt("director_id"), resultSet.getString("name"))
         );
+    }
+
+    private Map.Entry<Long, Long> makeOrder(ResultSet resultSet, int rowNum) throws SQLException {
+        return Map.entry(resultSet.getLong("film_id"), resultSet.getLong("likes"));
     }
 
     private void updateFilmGenre(Film film) {
