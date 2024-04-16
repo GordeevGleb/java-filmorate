@@ -374,56 +374,48 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getCommon(long userId, long friendId) {
-        String sqlReadFilmQuery = "SELECT  f.id,\n" +
-                "        f.name AS film_name,\n" +
-                "        f.description,\n" +
-                "        f.release_date,\n" +
-                "        f.duration,\n" +
-                "        f.rating_id,\n" +
-                "        r.name AS rating_name,\n" +
-                "        ARRAY_AGG(fg.genre_id) AS film_genres_id,\n" +
-                "        ARRAY_AGG(g.name) AS film_genres_name,\n" +
-                "        ARRAY_AGG(fd.director_id) AS film_director_id,\n" +
-                "        ARRAY_AGG(d.name) AS film_director_name\n" +
-                "FROM film AS f\n" +
-                "LEFT JOIN rating AS r ON f.rating_id = r.id\n" +
-                "LEFT JOIN film_genre AS fg ON f.id = fg.film_id\n" +
-                "LEFT JOIN genre AS g ON fg.genre_id = g.id\n" +
-                "LEFT JOIN film_director AS fd ON f.id = fd.film_id\n" +
-                "LEFT JOIN director AS d ON fd.director_id = d.id\n" +
-                "WHERE f.id IN (\n" +
-                "                SELECT film_id\n" +
-                "                FROM film_likes\n" +
-                "                WHERE user_id = :userId AND film_id IN (\n" +
-                "                       SELECT film_id\n" +
-                "                       FROM film_likes\n" +
-                "                       WHERE user_id = :friendId\n" +
-                "                   )\n" +
-                "              )\n" +
-                "GROUP BY f.id;";
+        String sqlReadFilmQuery = "WITH common_ids AS (\n" +
+                "    SELECT film_id\n" +
+                "    FROM film_likes\n" +
+                "    WHERE user_id = :userId AND film_id IN (\n" +
+                "        SELECT film_id\n" +
+                "        FROM film_likes\n" +
+                "        WHERE user_id = :friendId\n" +
+                "    )\n" +
+                ")\n" +
+                "SELECT f.id,\n" +
+                "    f.name AS film_name,\n" +
+                "    f.description,\n" +
+                "    f.release_date,\n" +
+                "    f.duration,\n" +
+                "    f.rating_id,\n" +
+                "    r.name AS rating_name,\n" +
+                "    (SELECT ARRAY_AGG(genre_id)\n" +
+                "     FROM film_genre\n" +
+                "     WHERE film_id = f.id) AS film_genres_id,\n" +
+                "     \n" +
+                "    (SELECT ARRAY_AGG(name)\n" +
+                "     FROM genre\n" +
+                "     WHERE id IN (SELECT genre_id FROM film_genre WHERE film_id = f.id)) AS film_genres_name,\n" +
+                "     \n" +
+                "    (SELECT ARRAY_AGG(director_id)\n" +
+                "     FROM film_director\n" +
+                "     WHERE film_id = f.id) AS film_director_id,\n" +
+                "     \n" +
+                "    (SELECT ARRAY_AGG(name)\n" +
+                "     FROM director\n" +
+                "     WHERE id IN (SELECT director_id FROM film_director WHERE film_id = f.id)) AS film_director_name\n" +
+                "\n" +
+                "FROM film f INNER JOIN common_ids ON f.id = common_ids.film_id\n" +
+                "INNER JOIN film_likes fl ON f.id = fl.film_id\n" +
+                "INNER JOIN rating r ON f.rating_id = r.id\n" +
+                "GROUP BY f.id\n" +
+                "ORDER BY count(fl.film_id) DESC;";
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("userId", userId)
                 .addValue("friendId", friendId);
 
-        var films = jdbcTemplate.query(sqlReadFilmQuery, namedParameters, this::makeAllFilms);
-
-        String sqlReadLikesQuery = "SELECT film_id,\n" +
-                "               COUNT(film_id) AS likes\n" +
-                "FROM film_likes\n" +
-                "WHERE film_id IN (\n" +
-                "                SELECT film_id\n" +
-                "                FROM film_likes\n" +
-                "                WHERE user_id = :userId AND film_id IN (\n" +
-                "                    SELECT film_id\n" +
-                "                    FROM film_likes\n" +
-                "                    WHERE user_id = :friendId\n" +
-                "                )\n" +
-                "              )\n" +
-                "GROUP BY film_id;";
-        var order = jdbcTemplate.query(sqlReadLikesQuery, namedParameters, this::makeOrder).stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        films.sort((f1, f2) -> Long.compare(order.get(f2.getId()), order.get(f1.getId())));
-        return films;
+        return jdbcTemplate.query(sqlReadFilmQuery, namedParameters, this::makeAllFilms);
     }
 
     private void addGenreInFilms(List<Film> films, List<FilmGenre> filmGenres) {
