@@ -31,7 +31,7 @@ class FilmControllerTest {
     @MockBean
     private FilmService filmService;
 
-    private final int MIN_YEAR = 1895;
+    private static final int MIN_YEAR = 1895;
 
     private static ObjectMapper mapper;
 
