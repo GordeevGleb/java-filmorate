@@ -65,8 +65,9 @@ class DbFilmStorageTest {
                 new LinkedHashSet<>()
         );
         filmWithoutGenre = new Film(2, "without_genre", "without_genre_description",
-                LocalDate.of(2001, 6, 4),
-                20, ratings.get(2), new LinkedHashSet<>(),
+                LocalDate.of(2003, 6, 4),
+                20, ratings.get(2),
+                new LinkedHashSet<>(),
                 new LinkedHashSet<>()
         );
         filmWithoutMpa = new Film(1, "without_rating", "without_rating_description",
@@ -197,7 +198,7 @@ class DbFilmStorageTest {
 
     @Test
     public void getPopularEmpty() {
-        assertThat(dbFilmStorage.getPopular(10))
+        assertThat(dbFilmStorage.getPopular(10, null, null))
                 .isNotNull()
                 .isEmpty();
     }
@@ -206,7 +207,7 @@ class DbFilmStorageTest {
     public void getPopularWithoutLikes() {
         dbFilmStorage.create(film);
         dbFilmStorage.create(filmWithoutMpa);
-        assertThat(dbFilmStorage.getPopular(10))
+        assertThat(dbFilmStorage.getPopular(10, null, null))
                 .isNotNull()
                 .hasSize(2);
     }
@@ -215,10 +216,10 @@ class DbFilmStorageTest {
     public void getPopularWithLikes() {
         var filmsId = initDb();
 
-        assertThat(dbFilmStorage.getPopular(2))
+        assertThat(dbFilmStorage.getPopular(2, null, null))
                 .isNotNull()
                 .hasSize(2);
-        var films = dbFilmStorage.getPopular(10);
+        var films = dbFilmStorage.getPopular(10, null, null);
         assertThat(films)
                 .isNotNull()
                 .hasSize(filmsId.size());
@@ -240,27 +241,77 @@ class DbFilmStorageTest {
     }
 
     @Test
-    public void getCommonEmpty() {
-        assertThat(dbFilmStorage.getCommon(1, 2))
+    public void getPopularWithYear() {
+        var filmsId = initDb();
+
+        assertThat(dbFilmStorage.getPopular(1, null, filmWithoutMpa.getReleaseDate().getYear()))
                 .isNotNull()
-                .isEmpty();
+                .hasSize(1);
+        var films = dbFilmStorage.getPopular(10, null, filmWithoutMpa.getReleaseDate().getYear());
+        assertThat(films)
+                .isNotNull()
+                .hasSize(2);
+        assertThat(films.get(0).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(2));
+        assertThat(films.get(1).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(1));
+        films = dbFilmStorage.getPopular(10, null, filmWithoutAll.getReleaseDate().getYear());
+        assertThat(films)
+                .isNotNull()
+                .hasSize(1);
+        assertThat(films.get(0).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(3));
     }
 
     @Test
-    public void getCommonNotEmpty() {
+    public void getPopularWithGenre() {
         var filmsId = initDb();
 
-        var films = dbFilmStorage.getCommon(1, 2);
+        assertThat(dbFilmStorage.getPopular(1, 3, null))
+                .isNotNull()
+                .hasSize(1);
+        var films = dbFilmStorage.getPopular(10, 3, null);
         assertThat(films)
                 .isNotNull()
-                .hasSize(3);
+                .hasSize(2);
+        System.out.println();
+        films.forEach(System.out::println);
+        System.out.println();
+        assertThat(films.get(0).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(0));
+        assertThat(films.get(1).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(1));
+    }
+
+    @Test
+    public void getPopularWithGenreAndYear() {
+        var filmsId = initDb();
+
+        assertThat(dbFilmStorage.getPopular(1, 1, film.getReleaseDate().getYear()))
+                .isNotNull()
+                .hasSize(1);
+        assertThat(dbFilmStorage.getPopular(10, 1, film.getReleaseDate().getYear()))
+                .isNotNull()
+                .hasSize(1);
+        assertThat(dbFilmStorage.getPopular(10, 3, filmWithoutMpa.getReleaseDate().getYear()))
+                .isNotNull()
+                .hasSize(1);
+        assertThat(dbFilmStorage.getPopular(1, 2, film.getReleaseDate().getYear()))
+                .isNotNull()
+                .hasSize(1);
+        var films = dbFilmStorage.getPopular(10, 2, film.getReleaseDate().getYear());
+        assertThat(films)
+                .isNotNull()
+                .hasSize(2);
         assertThat(films.get(0).getId())
                 .isNotNull()
                 .isEqualTo(filmsId.get(4));
         assertThat(films.get(1).getId())
-                .isNotNull()
-                .isEqualTo(filmsId.get(2));
-        assertThat(films.get(2).getId())
                 .isNotNull()
                 .isEqualTo(filmsId.get(0));
     }
@@ -296,7 +347,34 @@ class DbFilmStorageTest {
 
         // filmWithoutAll id == 4, likes amount == 1
         dbFilmStorage.putLike(filmsId.get(3), usersId.get(0));
+
         // filmWithoutMpa id == 2, likes amount == 0
         return filmsId;
+    }
+
+    @Test
+    public void getCommonEmpty() {
+        assertThat(dbFilmStorage.getCommon(1, 2))
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    public void getCommonNotEmpty() {
+        var filmsId = initDb();
+
+        var films = dbFilmStorage.getCommon(1, 2);
+        assertThat(films)
+                .isNotNull()
+                .hasSize(3);
+        assertThat(films.get(0).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(4));
+        assertThat(films.get(1).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(2));
+        assertThat(films.get(2).getId())
+                .isNotNull()
+                .isEqualTo(filmsId.get(0));
     }
 }
