@@ -4,6 +4,7 @@ Allows the user to add, retrieve and delete users and films from database using 
 
 ## Database structure
 
+
 ![Database structure in the form of an ER diagram](filmorate.png)
 
 The image can be changed on the website https://dbdiagram.io.
@@ -104,3 +105,4 @@ Ref: feed.user_id < users.id
 Ref: feed.event_type < event_type.id
 Ref: feed.operation < operation.id
 ```
+
