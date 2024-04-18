@@ -33,8 +33,13 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format("film with id == %d not found", review.getFilmId()));
         }
         review.setReviewId(reviewStorage.addAndReturnId(review));
-        feedStorage.recordEvent(new Feed(new Date().getTime(), review.getUserId(),
-                EventType.REVIEW, Operation.ADD, review.getReviewId()));
+        feedStorage.recordEvent(Feed.builder()
+                .timestamp(new Date().getTime())
+                .userId(review.getUserId())
+                .eventType(EventType.REVIEW)
+                .operation(Operation.ADD)
+                .entityId(review.getReviewId())
+                .build());
         return review;
     }
 
@@ -45,8 +50,13 @@ public class ReviewServiceImpl implements ReviewService {
         }
         Review oldReview = reviewStorage.getById(review.getReviewId());
         Review newReview = reviewStorage.update(review);
-        feedStorage.recordEvent(new Feed(new Date().getTime(), oldReview.getUserId(),
-                EventType.REVIEW, Operation.UPDATE, oldReview.getReviewId()));
+        feedStorage.recordEvent(Feed.builder()
+                .timestamp(new Date().getTime())
+                .userId(oldReview.getUserId())
+                .eventType(EventType.REVIEW)
+                .operation(Operation.UPDATE)
+                .entityId(oldReview.getReviewId())
+                .build());
         return newReview;
     }
 
@@ -56,8 +66,13 @@ public class ReviewServiceImpl implements ReviewService {
             throw new NotFoundException(String.format("review with id == %d not found", id));
         }
         Review review = reviewStorage.getById(id);
-        feedStorage.recordEvent(new Feed(new Date().getTime(), review.getUserId(),
-                EventType.REVIEW, Operation.REMOVE, review.getReviewId()));
+        feedStorage.recordEvent(Feed.builder()
+                .timestamp(new Date().getTime())
+                .userId(review.getUserId())
+                .eventType(EventType.REVIEW)
+                .operation(Operation.REMOVE)
+                .entityId(review.getReviewId())
+                .build());
         reviewStorage.delete(id);
     }
 
