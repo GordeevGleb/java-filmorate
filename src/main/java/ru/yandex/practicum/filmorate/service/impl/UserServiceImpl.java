@@ -62,7 +62,13 @@ public class UserServiceImpl implements UserService {
         } catch (DataIntegrityViolationException e) {
             throw new NotFoundException("user or friend not found");
         }
-        feedStorage.recordEvent(new Feed(new Date().getTime(), id, EventType.FRIEND, Operation.ADD,  friendId));
+        feedStorage.recordEvent(Feed.builder()
+                .timestamp(new Date().getTime())
+                .userId(id)
+                .eventType(EventType.FRIEND)
+                .operation(Operation.ADD)
+                .entityId(friendId)
+                .build());
     }
 
     @Override
@@ -77,7 +83,13 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException(String.format("friend with id == %d not found", id));
         }
         userStorage.deleteFriends(id, friendId);
-        feedStorage.recordEvent(new Feed(new Date().getTime(), id, EventType.FRIEND, Operation.REMOVE,  friendId));
+        feedStorage.recordEvent(Feed.builder()
+                .timestamp(new Date().getTime())
+                .userId(id)
+                .eventType(EventType.FRIEND)
+                .operation(Operation.REMOVE)
+                .entityId(friendId)
+                .build());
     }
 
     @Override
