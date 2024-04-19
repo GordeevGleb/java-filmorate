@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Feed;
@@ -16,6 +17,7 @@ import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import java.util.Collection;
 import java.util.Date;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -27,9 +29,11 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Review add(Review review) {
         if (!isUserExists(review.getUserId())) {
+            log.info("user with id == {} not found", review.getUserId());
             throw new NotFoundException(String.format("user with id == %d not found", review.getUserId()));
         }
         if (!isFilmExists(review.getFilmId())) {
+            log.info("film with id == {} not found", review.getFilmId());
             throw new NotFoundException(String.format("film with id == %d not found", review.getFilmId()));
         }
         review.setReviewId(reviewStorage.addAndReturnId(review));
@@ -41,6 +45,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Review update(Review review) {
         if (!reviewStorage.isReviewExists(review.getReviewId())) {
+            log.info("review with id == {} not found", review.getReviewId());
             throw new NotFoundException(String.format("review with id == %d not found", review.getReviewId()));
         }
         Review oldReview = reviewStorage.getById(review.getReviewId());
@@ -53,6 +58,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void delete(long id) {
         if (!reviewStorage.isReviewExists(id)) {
+            log.info("review with id == {} not found", id);
             throw new NotFoundException(String.format("review with id == %d not found", id));
         }
         Review review = reviewStorage.getById(id);
@@ -77,9 +83,11 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void addLike(long reviewId, long userId) {
         if (!reviewStorage.isReviewExists(reviewId)) {
+            log.info("review with id == {} not found", reviewId);
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
         if (!isUserExists(userId)) {
+            log.info("user with id == {} not found", userId);
             throw new NotFoundException(String.format("user with id == %d not found", userId));
         }
         reviewStorage.addLike(reviewId, userId);
@@ -88,23 +96,27 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void addDislike(long reviewId, long userId) {
         if (!reviewStorage.isReviewExists(reviewId)) {
+            log.info("review with id == {} not found", reviewId);
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
         if (!isUserExists(userId)) {
+            log.info("user with id == {} not found", userId);
             throw new NotFoundException(String.format("user with id == %d not found", userId));
         }
         reviewStorage.addDislike(reviewId, userId);
     }
 
     @Override
-    public void deleteLikeOrDislike(long reviewId, long userId) {
+    public void deleteLikeOrDislike(long reviewId, long userId, boolean isDislikeDeleted) {
         if (!reviewStorage.isReviewExists(reviewId)) {
+            log.info("review with id == {} not found", reviewId);
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
         if (!isUserExists(userId)) {
+            log.info("user with id == {} not found", userId);
             throw new NotFoundException(String.format("user with id == %d not found", userId));
         }
-        reviewStorage.deleteLikeOrDislike(reviewId, userId);
+        reviewStorage.deleteLikeOrDislike(reviewId, userId, isDislikeDeleted);
     }
 
     private boolean isFilmExists(long id) {

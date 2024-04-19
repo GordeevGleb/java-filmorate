@@ -21,7 +21,7 @@ public interface ReviewStorage {
 
     void addDislike(long reviewId, long userId);
 
-    void deleteLikeOrDislike(long reviewId, long userId);
+    void deleteLikeOrDislike(long reviewId, long userId, boolean isDislikeDeleted);
 
     boolean isReviewExists(long id);
 }
