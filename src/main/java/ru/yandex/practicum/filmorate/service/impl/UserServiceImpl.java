@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserStorage userStorage;
@@ -54,6 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addFriends(Long id, Long friendId) {
+        log.info("uid validation and existence check");
         if (id.equals(friendId)) {
             throw new ValidationException("PUT friends: id equals friendId");
         }
@@ -67,6 +70,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteFriends(Long id, Long friendId) {
+        log.info("uid validation check");
         if (id.equals(friendId)) {
             throw new ValidationException("DELETE friends: id equals friendId");
         }
@@ -90,6 +94,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getCommonFriends(Long id, Long secondId) {
+        log.info("uid validation check");
         if (id.equals(secondId)) {
             throw new ValidationException("firstId equals friendId");
         }
@@ -97,6 +102,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean isUserExist(Long id) {
+        log.info("user existence check");
         return userStorage.findById(id).isPresent();
     }
 }
