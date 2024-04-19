@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS review (
     is_positive BOOL NOT NULL,
     user_id bigint NOT NULL,
     film_id bigint NOT NULL,
+    useful bigint DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (film_id) REFERENCES film(id) ON DELETE CASCADE
 );
