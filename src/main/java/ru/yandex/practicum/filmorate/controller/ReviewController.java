@@ -80,7 +80,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(@PathVariable long id, @PathVariable long userId) {
         log.info("DELETE /reviews/like: {}, {}", id, userId);
-        reviewService.deleteLikeOrDislike(id, userId, false);
+        reviewService.deleteLike(id, userId);
         log.info("completion DELETE /reviews/like: success");
     }
 
@@ -88,7 +88,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDislike(@PathVariable long id, @PathVariable long userId) {
         log.info("DELETE /reviews/dislike: {}, {}", id, userId);
-        reviewService.deleteLikeOrDislike(id, userId, true);
+        reviewService.deleteDislike(id, userId);
         log.info("completion DELETE /reviews/dislike: success");
     }
 }

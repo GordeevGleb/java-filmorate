@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Feed;
-import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Operation;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.FeedStorage;
 
 import java.util.Collection;
 import java.util.Date;
@@ -28,43 +28,50 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review add(Review review) {
+        log.info("is review[id={}] exists check", review.getReviewId());
         if (!isUserExists(review.getUserId())) {
-            log.info("user with id == {} not found", review.getUserId());
             throw new NotFoundException(String.format("user with id == %d not found", review.getUserId()));
         }
+        log.info("review[id={}] exists", review.getReviewId());
+        log.info("is film[id={}] exists check", review.getFilmId());
         if (!isFilmExists(review.getFilmId())) {
-            log.info("film with id == {} not found", review.getFilmId());
             throw new NotFoundException(String.format("film with id == %d not found", review.getFilmId()));
         }
+        log.info("film[id={}] exists", review.getFilmId());
         review.setReviewId(reviewStorage.addAndReturnId(review));
         feedStorage.recordEvent(new Feed(new Date().getTime(), review.getUserId(),
                 EventType.REVIEW, Operation.ADD, review.getReviewId()));
+        log.info("add review[id={}]", review.getReviewId());
         return review;
     }
 
     @Override
     public Review update(Review review) {
+        log.info("is review[id={}] exists check", review.getReviewId());
         if (!reviewStorage.isReviewExists(review.getReviewId())) {
-            log.info("review with id == {} not found", review.getReviewId());
             throw new NotFoundException(String.format("review with id == %d not found", review.getReviewId()));
         }
+        log.info("review[id={}] exists", review.getReviewId());
         Review oldReview = reviewStorage.getById(review.getReviewId());
         Review newReview = reviewStorage.update(review);
         feedStorage.recordEvent(new Feed(new Date().getTime(), oldReview.getUserId(),
                 EventType.REVIEW, Operation.UPDATE, oldReview.getReviewId()));
+        log.info("review[id={}] updated to {}", review.getReviewId(), newReview);
         return newReview;
     }
 
     @Override
     public void delete(long id) {
+        log.info("is review[id={}] exists check", id);
         if (!reviewStorage.isReviewExists(id)) {
-            log.info("review with id == {} not found", id);
             throw new NotFoundException(String.format("review with id == %d not found", id));
         }
+        log.info("review[id={}] exists", id);
         Review review = reviewStorage.getById(id);
         feedStorage.recordEvent(new Feed(new Date().getTime(), review.getUserId(),
                 EventType.REVIEW, Operation.REMOVE, review.getReviewId()));
         reviewStorage.delete(id);
+        log.info("review[id={}] deleted", id);
     }
 
     @Override
@@ -75,55 +82,80 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Collection<Review> getAll(Long filmId, long count) {
         if (filmId == null) {
+            log.info("film is not indicated");
             return reviewStorage.getAll(count);
         }
+        log.info("film indicated, filmId=[{}]", filmId);
         return reviewStorage.getFilmReviews(filmId, count);
     }
 
     @Override
     public void addLike(long reviewId, long userId) {
+        log.info("is review[id={}] exists check", reviewId);
         if (!reviewStorage.isReviewExists(reviewId)) {
-            log.info("review with id == {} not found", reviewId);
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
+        log.info("review[id={}] exists", reviewId);
         if (!isUserExists(userId)) {
-            log.info("user with id == {} not found", userId);
             throw new NotFoundException(String.format("user with id == %d not found", userId));
         }
+        log.info("user[id={}] exists", userId);
         reviewStorage.addLike(reviewId, userId);
+        log.info("like on review[id={}] from user[id={}] deleted", reviewId, userId);
     }
 
     @Override
     public void addDislike(long reviewId, long userId) {
+        log.info("is review[id={}] exists check", reviewId);
         if (!reviewStorage.isReviewExists(reviewId)) {
-            log.info("review with id == {} not found", reviewId);
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
+        log.info("review[id={}] exists", reviewId);
         if (!isUserExists(userId)) {
-            log.info("user with id == {} not found", userId);
             throw new NotFoundException(String.format("user with id == %d not found", userId));
         }
+        log.info("user[id={}] exists", userId);
         reviewStorage.addDislike(reviewId, userId);
+        log.info("dislike on review[id={}] from user[id={}] deleted", reviewId, userId);
     }
 
     @Override
-    public void deleteLikeOrDislike(long reviewId, long userId, boolean isDislikeDeleted) {
+    public void deleteLike(long reviewId, long userId) {
+        log.info("is review[id={}] exists check", reviewId);
         if (!reviewStorage.isReviewExists(reviewId)) {
-            log.info("review with id == {} not found", reviewId);
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
+        log.info("review[id={}] exists", reviewId);
         if (!isUserExists(userId)) {
-            log.info("user with id == {} not found", userId);
             throw new NotFoundException(String.format("user with id == %d not found", userId));
         }
-        reviewStorage.deleteLikeOrDislike(reviewId, userId, isDislikeDeleted);
+        log.info("user[id={}] exists", userId);
+        reviewStorage.deleteLike(reviewId, userId);
+        log.info("like on review[id={}] from user[id={}] deleted", reviewId, userId);
+    }
+
+    @Override
+    public void deleteDislike(long reviewId, long userId) {
+        log.info("is review[id={}] exists check", reviewId);
+        if (!reviewStorage.isReviewExists(reviewId)) {
+            throw new NotFoundException(String.format("review with id == %d not found", reviewId));
+        }
+        log.info("review[id={}] exists", reviewId);
+        if (!isUserExists(userId)) {
+            throw new NotFoundException(String.format("user with id == %d not found", userId));
+        }
+        log.info("user[id={}] exists", userId);
+        reviewStorage.deleteDislike(reviewId, userId);
+        log.info("dislike on review[id={}] from user[id={}] deleted", reviewId, userId);
     }
 
     private boolean isFilmExists(long id) {
+        log.info("is film[id={}] exists check", id);
         return filmStorage.findById(id).isPresent();
     }
 
     private boolean isUserExists(long id) {
+        log.info("is user[id={}] exists check", id);
         return userStorage.findById(id).isPresent();
     }
 }
