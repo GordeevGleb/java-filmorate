@@ -7,7 +7,7 @@ import java.util.List;
 public interface FeedStorage {
     void recordEvent(Feed feed);
 
-    List<Feed> getFeed(Long id);
+    List<Feed> getFeed(Long userId);
 
     Long getEventTypeId(String eventType);
 
