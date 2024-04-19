@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Feed;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FilmServiceImpl implements FilmService {
 
     private final FilmStorage filmStorage;
@@ -74,6 +76,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<Film> getByDirectorId(Long id, String sortBy) {
+        log.info("director existence check");
         if (directorStorage.findById(id).isEmpty()) {
             throw new NotFoundException(String.format("director with id == %d not found", id));
         }
@@ -99,14 +102,17 @@ public class FilmServiceImpl implements FilmService {
         final String TITLE = "title";
 
         String[] byArray = by.split(",");
-
+        log.info("by size: {}", byArray.length);
         if (byArray.length == 1) {
             if (DIRECTOR.equals(byArray[0])) {
+                log.info("search films by director");
                 return filmStorage.findByDirectorName(query);
             } else if (TITLE.equals(byArray[0])) {
+                log.info("search films by title");
                 return filmStorage.findByTitle(query);
             }
         } else if (byArray.length == 2) {
+            log.info("search films by title & director");
             if (DIRECTOR.equals(byArray[0]) || TITLE.equals(byArray[1])) {
                 return filmStorage.findByTitleOrDirectorName(query, query);
             } else if (TITLE.equals(byArray[0]) || DIRECTOR.equals(byArray[1])) {
