@@ -73,36 +73,28 @@ public class DbReviewStorage implements ReviewStorage {
     public void addLike(long reviewId, long userId) {
         String sqlQuery = "insert into review_likes (review_id, user_id, is_like) values (?, ?, ?)";
         jdbcTemplate.update(sqlQuery, reviewId, userId, true);
-        updateUseful(reviewId, true);
+        increaseUseful(reviewId);
     }
 
     @Override
     public void addDislike(long reviewId, long userId) {
         String sqlQuery = "insert into review_likes (review_id, user_id, is_like) values (?, ?, ?)";
         jdbcTemplate.update(sqlQuery, reviewId, userId, false);
-        updateUseful(reviewId, false);
+        decreaseUseful(reviewId);
     }
 
     @Override
     public void deleteLike(long reviewId, long userId) {
         String sqlQuery = "delete from review_likes where review_id = ? and user_id = ? ";
         jdbcTemplate.update(sqlQuery, reviewId, userId);
-        updateUseful(reviewId, false);
+        decreaseUseful(reviewId);
     }
 
     @Override
     public void deleteDislike(long reviewId, long userId) {
         String sqlQuery = "delete from review_likes where review_id = ? and user_id = ? ";
         jdbcTemplate.update(sqlQuery, reviewId, userId);
-        updateUseful(reviewId, true);
-    }
-
-    private void updateUseful(long reviewId, boolean isLike) {
-        if (isLike) {
-            increaseUseful(reviewId);
-        } else {
-            decreaseUseful(reviewId);
-        }
+        increaseUseful(reviewId);
     }
 
     private void increaseUseful(long reviewId) {
