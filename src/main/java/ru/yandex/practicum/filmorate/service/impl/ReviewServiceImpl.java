@@ -43,6 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Review update(Review review) {
         if (!reviewStorage.isReviewExists(review.getReviewId())) {
+            log.info("review not found");
             throw new NotFoundException(String.format("review with id == %d not found", review.getReviewId()));
         }
         Review oldReview = reviewStorage.getById(review.getReviewId());
@@ -55,6 +56,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void delete(long id) {
         if (!reviewStorage.isReviewExists(id)) {
+            log.info("review not found");
             throw new NotFoundException(String.format("review with id == %d not found", id));
         }
         Review review = reviewStorage.getById(id);
@@ -81,7 +83,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void addLike(long reviewId, long userId) {
         if (!reviewStorage.isReviewExists(reviewId)) {
-            log.info("review ");
+            log.info("review not found");
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
         if (!isUserExists(userId)) {
@@ -93,6 +95,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void addDislike(long reviewId, long userId) {
         if (!reviewStorage.isReviewExists(reviewId)) {
+            log.info("review not found");
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
         if (!isUserExists(userId)) {
@@ -104,6 +107,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void deleteLikeOrDislike(long reviewId, long userId) {
         if (!reviewStorage.isReviewExists(reviewId)) {
+            log.info("review not found");
             throw new NotFoundException(String.format("review with id == %d not found", reviewId));
         }
         if (!isUserExists(userId)) {
