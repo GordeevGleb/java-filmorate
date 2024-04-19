@@ -45,8 +45,13 @@ public class DbFeedStorageTest {
     @Test
     public void recordEventSuccess() {
         dbUserStorage.create(user);
-        dbFeedStorage.recordEvent(new Feed(new Date().getTime(), user.getId(),
-                EventType.LIKE, Operation.ADD, 1L));
+        dbFeedStorage.recordEvent(Feed.builder()
+                .timestamp(new Date().getTime())
+                .userId(user.getId())
+                .eventType(EventType.LIKE)
+                .operation(Operation.ADD)
+                .entityId(1L)
+                .build());
         assertThat(dbFeedStorage.getFeed(user.getId()))
                 .isNotNull()
                 .isInstanceOf(List.class)
@@ -56,16 +61,26 @@ public class DbFeedStorageTest {
     @Test
     public void recordEventFailureWrongUserId() {
         Long wrongUserId = 999L;
-        assertThatThrownBy(() -> dbFeedStorage.recordEvent(new Feed(new Date().getTime(), wrongUserId,
-                EventType.LIKE, Operation.ADD, 1L)))
+        assertThatThrownBy(() -> dbFeedStorage.recordEvent(Feed.builder()
+                .timestamp(new Date().getTime())
+                .userId(wrongUserId)
+                .eventType(EventType.LIKE)
+                .operation(Operation.ADD)
+                .entityId(1L)
+                .build()))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
     public void getFeedSuccess() {
         dbUserStorage.create(user);
-        dbFeedStorage.recordEvent(new Feed(new Date().getTime(), user.getId(),
-                EventType.LIKE, Operation.ADD, 1L));
+        dbFeedStorage.recordEvent(Feed.builder()
+                .timestamp(new Date().getTime())
+                .userId(user.getId())
+                .eventType(EventType.LIKE)
+                .operation(Operation.ADD)
+                .entityId(1L)
+                .build());
         List<Feed> feed = dbFeedStorage.getFeed(user.getId());
         assertThat(feed)
                 .isNotNull()

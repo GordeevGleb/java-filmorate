@@ -39,9 +39,9 @@ public class DbFeedStorage implements FeedStorage {
     }
 
     @Override
-    public List<Feed> getFeed(Long id) {
+    public List<Feed> getFeed(Long userId) {
         SqlParameterSource namedParameters = new MapSqlParameterSource()
-                .addValue("id", id);
+                .addValue("id", userId);
         String sqlQuery =
                 "SELECT f.timestamp,\n" +
                         "    f.user_id,\n" +
@@ -80,12 +80,14 @@ public class DbFeedStorage implements FeedStorage {
     }
 
     private Feed makeFeeds(ResultSet resultSet, int rowNum) throws SQLException {
-        return new Feed(resultSet.getLong("timestamp"),
-                resultSet.getLong("user_id"),
-                EventType.valueOf(resultSet.getString("even_type_name")),
-                Operation.valueOf(resultSet.getString("operation_name")),
-                resultSet.getLong("event_id"),
-                resultSet.getLong("entity_id"));
+        return Feed.builder()
+                .timestamp(resultSet.getLong("timestamp"))
+                .userId(resultSet.getLong("user_id"))
+                .eventType(EventType.valueOf(resultSet.getString("even_type_name")))
+                .operation(Operation.valueOf(resultSet.getString("operation_name")))
+                .eventId(resultSet.getLong("event_id"))
+                .entityId(resultSet.getLong("entity_id"))
+                .build();
     }
 
     private Long makeEventTypeId(ResultSet resultSet, int rowNum) throws SQLException {
