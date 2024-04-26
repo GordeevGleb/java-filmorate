@@ -1,14 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -40,12 +41,12 @@ public class DbUserStorage implements UserStorage {
     public Optional<User> update(User user) {
         String sqlUpdateQuery =
                 "UPDATE users " +
-                        "SET " +
-                        "email = :email, " +
-                        "login = :login, " +
-                        "name = :name, " +
-                        "birthday = :birthday " +
-                        "WHERE id = :id";
+                "SET " +
+                    "email = :email, " +
+                    "login = :login, " +
+                    "name = :name, " +
+                    "birthday = :birthday " +
+                "WHERE id = :id";
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("email", user.getEmail())
                 .addValue("login", user.getLogin())
@@ -64,7 +65,7 @@ public class DbUserStorage implements UserStorage {
     public List<User> findAll() {
         String sqlQuery =
                 "SELECT * " +
-                        "FROM users;";
+                "FROM users;";
         return jdbcTemplate.query(sqlQuery, this::makeUsers);
     }
 
@@ -73,6 +74,12 @@ public class DbUserStorage implements UserStorage {
         SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
         String sqlReadQuery = "SELECT * FROM users WHERE id = :id";
         return jdbcTemplate.query(sqlReadQuery, namedParameters, this::makeUser);
+    }
+
+    @Override
+    public void delete(Long id) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
+        jdbcTemplate.update("DELETE FROM users WHERE id = :id", namedParameters);
     }
 
     @Override
@@ -95,7 +102,7 @@ public class DbUserStorage implements UserStorage {
     public List<User> getFriends(Long id) {
         SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
         String sqlQuery =
-                "SELECT u.id,\n" +
+                        "SELECT u.id,\n" +
                         "       u.email,\n" +
                         "       u.login,\n" +
                         "       u.name,\n" +
@@ -162,5 +169,21 @@ public class DbUserStorage implements UserStorage {
             ));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Long findUserWithSimilarLikes(Long userId) {
+        SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("user_id", userId);
+        String sqlQuery = "SELECT fl2.user_id " +
+                "FROM FILM_LIKES AS fl1, FILM_LIKES AS fl2 " +
+                "WHERE fl1.film_id = fl2.film_id " +
+                "AND fl1.user_id = :user_id AND fl1.user_id <> fl2.user_id " +
+                "GROUP BY fl1.user_id, fl2.user_id " +
+                "ORDER BY count(*) desc limit 1";
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, namedParameters, Long.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 }

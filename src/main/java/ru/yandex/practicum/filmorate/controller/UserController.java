@@ -4,8 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.FeedService;
+import ru.yandex.practicum.filmorate.model.Feed;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -17,6 +21,9 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+    private final FilmService filmService;
+    private final FeedService feedService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,6 +58,14 @@ public class UserController {
         return resultUser;
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        log.info("DELETE /users: {}", id);
+        userService.delete(id);
+        log.info("completion DELETE /users: success");
+    }
+
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriends(@PathVariable Long id, @PathVariable Long friendId) {
         log.info("PUT /friends: {}, {}", id, friendId);
@@ -79,6 +94,22 @@ public class UserController {
         log.info("GET /friends/common: {}, {}", id, secondId);
         var result = userService.getCommonFriends(id, secondId);
         log.info("completion GET /friends/common: size {}", result.size());
+        return result;
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable Long id) {
+        log.info("GET / recommendations: {}", id);
+        List<Film> resultList = filmService.getRecommendation(id);
+        log.info("completion GET /recommendations: size {}", resultList.size());
+        return resultList;
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Feed> getUserFeed(@PathVariable Long id) {
+        log.info("GET /users/{}/feed", id);
+        var result = feedService.getUserFeed(id);
+        log.info("completion GET /users/{}/feed : {}", id, result);
         return result;
     }
 }
